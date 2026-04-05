@@ -6,6 +6,7 @@ import {
   getCityGroups,
   getStateGroups,
   getSEOPages,
+  getBlogPosts,
 } from "@/lib/sheets";
 
 export const revalidate = 3600;
@@ -13,13 +14,14 @@ export const revalidate = 3600;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
-  const [listings, categories, cityGroups, stateGroups, seoPages] =
+  const [listings, categories, cityGroups, stateGroups, seoPages, blogPosts] =
     await Promise.all([
       getAllListings(),
       getAllCategories(),
       getCityGroups(),
       getStateGroups(),
       getSEOPages(),
+      getBlogPosts(),
     ]);
 
   const base = siteConfig.url;
@@ -74,6 +76,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // Blog pages
+  const blogRoutes: MetadataRoute.Sitemap = [
+    {
+      url: `${base}/blog`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.7,
+    },
+    ...blogPosts.map((post) => ({
+      url: `${base}/blog/${post.slug}`,
+      lastModified: post.publishedAt ? new Date(post.publishedAt) : now,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
+  ];
+
   return [
     ...staticRoutes,
     ...listingRoutes,
@@ -81,5 +99,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...stateRoutes,
     ...cityRoutes,
     ...guideRoutes,
+    ...blogRoutes,
   ];
 }

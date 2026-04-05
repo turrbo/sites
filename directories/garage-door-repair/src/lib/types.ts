@@ -52,6 +52,24 @@ export interface SEOPage {
   published?: boolean;
 }
 
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt?: string;
+  author?: string;
+  imageUrl?: string;
+  category?: string;
+  tags?: string[];
+  city?: string;
+  state?: string;
+  publishedAt?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  published?: boolean;
+}
+
 export interface CityGroup {
   city: string;
   state: string;

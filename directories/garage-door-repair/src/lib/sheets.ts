@@ -1,4 +1,4 @@
-import { Listing, Category, SEOPage, CityGroup, StateGroup } from "./types";
+import { Listing, Category, SEOPage, BlogPost, CityGroup, StateGroup } from "./types";
 
 // --- Local seed data fallback (for development without Google Sheets) ---
 
@@ -388,6 +388,55 @@ export async function getSEOPageBySlug(
 ): Promise<SEOPage | null> {
   const pages = await getSEOPages();
   return pages.find((p) => p.slug === slug) || null;
+}
+
+// --- Blog ---
+
+const BLOG_SHEET = process.env.SHEETS_BLOG_TAB || "Blog";
+
+function mapBlogPost(row: SheetRow): BlogPost {
+  return {
+    id: row["Slug"] || row["Title"] || "",
+    title: row["Title"] || "",
+    slug: row["Slug"] || slugify(row["Title"] || ""),
+    content: row["Content"] || "",
+    excerpt: row["Excerpt"] || undefined,
+    author: row["Author"] || undefined,
+    imageUrl: row["Image URL"] || undefined,
+    category: row["Category"] || undefined,
+    tags: parseList(row["Tags"]),
+    city: row["City"] || undefined,
+    state: row["State"] || undefined,
+    publishedAt: row["Published At"] || undefined,
+    metaTitle: row["Meta Title"] || undefined,
+    metaDescription: row["Meta Description"] || undefined,
+    published: row["Published"] ? parseBoolean(row["Published"]) : true,
+  };
+}
+
+export async function getBlogPosts(): Promise<BlogPost[]> {
+  try {
+    const rows = await fetchSheet(BLOG_SHEET);
+    return rows
+      .map(mapBlogPost)
+      .filter((p) => p.published !== false)
+      .sort((a, b) => {
+        // Sort by publish date descending, then by title
+        if (a.publishedAt && b.publishedAt) {
+          return b.publishedAt.localeCompare(a.publishedAt);
+        }
+        return a.title.localeCompare(b.title);
+      });
+  } catch {
+    return [];
+  }
+}
+
+export async function getBlogPostBySlug(
+  slug: string
+): Promise<BlogPost | null> {
+  const posts = await getBlogPosts();
+  return posts.find((p) => p.slug === slug) || null;
 }
 
 // --- Helpers ---

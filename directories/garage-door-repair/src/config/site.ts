@@ -25,6 +25,7 @@ export const siteConfig = {
     { label: "Home", href: "/" },
     { label: "Cities", href: "/#cities" },
     { label: "Guides", href: "/#guides" },
+    { label: "Blog", href: "/blog" },
     { label: "List Your Business", href: "/list-your-business" },
   ],
 
