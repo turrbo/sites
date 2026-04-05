@@ -161,6 +161,51 @@ async function fetchSheet(sheetName: string): Promise<SheetRow[]> {
 }
 
 /**
+ * Fetch entire sheet without Next.js data cache (for large sheets >2MB).
+ * Uses in-memory caching instead to avoid Vercel's 2MB per-item cache limit.
+ */
+let seoPagesCacheData: { rows: SheetRow[]; expires: number } | null = null;
+
+async function fetchSheetUncached(sheetName: string): Promise<SheetRow[]> {
+  // In-memory cache for 1 hour (same as ISR revalidate)
+  if (seoPagesCacheData && Date.now() < seoPagesCacheData.expires) {
+    return seoPagesCacheData.rows;
+  }
+
+  const token = await getAccessToken();
+  const range = encodeURIComponent(`${sheetName}`);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}`;
+
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(
+      `Google Sheets error: ${res.status} ${await res.text()}`
+    );
+  }
+
+  const data = await res.json();
+  const rows: string[][] = data.values || [];
+
+  if (rows.length < 2) return [];
+
+  const headers = rows[0];
+  const result = rows.slice(1).map((row) => {
+    const obj: SheetRow = {};
+    headers.forEach((h, i) => {
+      obj[h] = row[i] || "";
+    });
+    return obj;
+  });
+
+  seoPagesCacheData = { rows: result, expires: Date.now() + 3600 * 1000 };
+  return result;
+}
+
+/**
  * Fetch specific column ranges from a sheet to stay under Vercel's 2MB data cache limit.
  * Uses batchGet to fetch multiple ranges in one request.
  */
@@ -431,7 +476,7 @@ export async function getAllCategories(): Promise<Category[]> {
 
 export async function getSEOPages(): Promise<SEOPage[]> {
   try {
-    const rows = await fetchSheet(SEO_PAGES_SHEET);
+    const rows = await fetchSheetUncached(SEO_PAGES_SHEET);
     return rows.map(mapSEOPage).filter((p) => p.published !== false);
   } catch {
     return [];
