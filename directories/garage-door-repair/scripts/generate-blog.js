@@ -285,12 +285,12 @@ const BLOG_POSTS = [
 
   // Cost & Pricing
   {
-    title: "How Much Does Garage Door Repair Cost in 2025?",
+    title: "How Much Does Garage Door Repair Cost in 2026?",
     category: "Cost & Pricing",
     tags: "cost,pricing,repair,budget",
     excerpt:
-      "Complete breakdown of garage door repair costs in 2025. From spring replacement to full door installation, know what to expect before you call.",
-    content: `<h2>Garage Door Repair Costs in 2025</h2>
+      "Complete breakdown of garage door repair costs in 2026. From spring replacement to full door installation, know what to expect before you call.",
+    content: `<h2>Garage Door Repair Costs in 2026</h2>
 <p>The average garage door repair costs between $150 and $500, depending on the type of repair needed. Some fixes are under $100, while major repairs or replacements can exceed $2,000. Here's a detailed breakdown of what to expect.</p>
 
 <h3>Common Repair Costs</h3>
@@ -347,9 +347,9 @@ const BLOG_POSTS = [
 <li>No written estimate or invoice</li>
 <li>No license, insurance, or online reviews</li>
 </ul>`,
-    metaTitle: "Garage Door Repair Cost 2025 | Complete Price Guide",
+    metaTitle: "Garage Door Repair Cost 2026 | Complete Price Guide",
     metaDescription:
-      "How much does garage door repair cost in 2025? Complete pricing guide for springs, openers, panels, cables, and full door replacement.",
+      "How much does garage door repair cost in 2026? Complete pricing guide for springs, openers, panels, cables, and full door replacement.",
   },
   {
     title: "Why Garage Door Spring Replacement Costs So Much",
@@ -416,7 +416,7 @@ const BLOG_POSTS = [
     category: "Cost & Pricing",
     tags: "opener,cost,pricing,replacement",
     excerpt:
-      "Thinking about replacing your garage door opener? Here's what it costs for chain-drive, belt-drive, and smart openers in 2025.",
+      "Thinking about replacing your garage door opener? Here's what it costs for chain-drive, belt-drive, and smart openers in 2026.",
     content: `<h2>Garage Door Opener Replacement Costs</h2>
 <p>A new garage door opener costs $200-$550 installed, depending on the type, features, and horsepower. Here's a complete breakdown to help you budget for a replacement.</p>
 
@@ -463,9 +463,9 @@ const BLOG_POSTS = [
 <h3>Our Recommendation</h3>
 <p>For most homeowners, a belt-drive opener with 1/2 or 3/4 HP, battery backup, and smart home connectivity offers the best value. Expect to pay $350-$450 installed. It's quiet, reliable, and includes the features most people want.</p>`,
     metaTitle:
-      "Garage Door Opener Replacement Cost 2025 | Types, Features & Prices",
+      "Garage Door Opener Replacement Cost 2026 | Types, Features & Prices",
     metaDescription:
-      "How much does a new garage door opener cost? Complete 2025 pricing for chain-drive, belt-drive, and smart openers with installation costs.",
+      "How much does a new garage door opener cost? Complete 2026 pricing for chain-drive, belt-drive, and smart openers with installation costs.",
   },
   {
     title: "Are Extended Warranties on Garage Doors Worth It?",
@@ -535,7 +535,7 @@ const BLOG_POSTS = [
     tags: "opener,brands,comparison,buying",
     excerpt:
       "Comparing the top garage door opener brands: LiftMaster, Chamberlain, Genie, and more. Features, reliability, and value rated.",
-    content: `<h2>Top Garage Door Opener Brands in 2025</h2>
+    content: `<h2>Top Garage Door Opener Brands in 2026</h2>
 <p>With dozens of garage door opener brands available, choosing the right one can be overwhelming. We've compared the major brands on reliability, features, price, and customer satisfaction to help you make the right choice.</p>
 
 <h3>LiftMaster (Best Overall)</h3>
@@ -588,7 +588,7 @@ const BLOG_POSTS = [
 <h3>Our Recommendation</h3>
 <p>For most homeowners, <strong>Chamberlain</strong> offers the best combination of reliability, features, and value. If you want the absolute best and have a professional install it, go with <strong>LiftMaster</strong>. On a tight budget, <strong>Genie</strong> delivers reliable performance at the lowest price.</p>`,
     metaTitle:
-      "Best Garage Door Opener Brands 2025 | LiftMaster vs Chamberlain vs Genie",
+      "Best Garage Door Opener Brands 2026 | LiftMaster vs Chamberlain vs Genie",
     metaDescription:
       "Comparing the top garage door opener brands: LiftMaster, Chamberlain, Genie, and Ryobi. Reliability, features, and value rated side by side.",
   },
@@ -712,7 +712,7 @@ const BLOG_POSTS = [
     metaTitle:
       "Smart Garage Door Openers Guide | What Features Actually Matter",
     metaDescription:
-      "What to look for in a smart garage door opener. Essential features, nice-to-haves, what to skip, and top recommendations for 2025.",
+      "What to look for in a smart garage door opener. Essential features, nice-to-haves, what to skip, and top recommendations for 2026.",
   },
   {
     title:
