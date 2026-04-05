@@ -72,28 +72,19 @@ function createJWT() {
   return `${si}.${sig}`;
 }
 
-function fetchJSON(url, options = {}) {
-  return new Promise((resolve, reject) => {
-    const urlObj = new URL(url);
-    const mod = urlObj.protocol === "https:" ? https : http;
-    const req = mod.request({
-      hostname: urlObj.hostname,
-      path: urlObj.pathname + urlObj.search,
-      method: options.method || "GET",
-      headers: options.headers || {},
-    }, (res) => {
-      let data = "";
-      res.on("data", chunk => data += chunk);
-      res.on("end", () => {
-        try { resolve(JSON.parse(data)); }
-        catch { resolve({ raw: data, status: res.statusCode }); }
-      });
-    });
-    req.on("error", reject);
-    req.setTimeout(60000, () => { req.destroy(); reject(new Error("timeout")); });
-    if (options.body) req.write(typeof options.body === "string" ? options.body : JSON.stringify(options.body));
-    req.end();
-  });
+async function fetchJSON(url, options = {}) {
+  const fetchOptions = {
+    method: options.method || "GET",
+    headers: options.headers || {},
+  };
+  if (options.body) {
+    const bodyStr = typeof options.body === "string" ? options.body : JSON.stringify(options.body);
+    fetchOptions.body = bodyStr;
+  }
+  const res = await fetch(url, fetchOptions);
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch { return { raw: text, status: res.status }; }
 }
 
 function fetchHTML(url, timeout = 8000) {
@@ -282,7 +273,7 @@ async function main() {
 
     // Batch write every 100 rows
     if (batchUpdates.length >= 100) {
-      await fetchJSON(
+      const batchRes = await fetchJSON(
         `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchUpdate`,
         {
           method: "POST",
@@ -293,6 +284,11 @@ async function main() {
           }),
         }
       );
+      if (batchRes.error) {
+        console.error("\nBatch write error:", JSON.stringify(batchRes.error));
+      } else {
+        console.log(`\n  -> Wrote batch of ${batchUpdates.length} rows`);
+      }
       batchUpdates.length = 0;
     }
 
@@ -302,7 +298,7 @@ async function main() {
 
   // Write remaining batch
   if (batchUpdates.length > 0) {
-    await fetchJSON(
+    const finalRes = await fetchJSON(
       `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchUpdate`,
       {
         method: "POST",
@@ -313,6 +309,11 @@ async function main() {
         }),
       }
     );
+    if (finalRes.error) {
+      console.error("\nFinal batch write error:", JSON.stringify(finalRes.error));
+    } else {
+      console.log(`\n  -> Wrote final batch of ${batchUpdates.length} rows`);
+    }
   }
 
   console.log(`\n\n=== Summary ===`);
