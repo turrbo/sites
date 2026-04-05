@@ -10,7 +10,6 @@ import {
 import { generateItemListJsonLd } from "@/lib/seo";
 import Hero from "@/components/Hero";
 import NearbyListings from "@/components/NearbyListings";
-import ListingCard from "@/components/ListingCard";
 import CityCard from "@/components/CityCard";
 import JsonLd from "@/components/JsonLd";
 
@@ -36,6 +35,26 @@ export default async function HomePage() {
       getSEOPagesMeta(),
     ]);
 
+  // Pick ~16 featured listings spread across different states for geographic diversity
+  const diverseFeatured: typeof featuredListings = [];
+  const seenStates = new Set<string>();
+  for (const listing of featuredListings) {
+    if (!seenStates.has(listing.state)) {
+      diverseFeatured.push(listing);
+      seenStates.add(listing.state);
+      if (diverseFeatured.length >= 16) break;
+    }
+  }
+  // If we didn't reach 16, fill with remaining featured
+  if (diverseFeatured.length < 16) {
+    for (const listing of featuredListings) {
+      if (!diverseFeatured.includes(listing)) {
+        diverseFeatured.push(listing);
+        if (diverseFeatured.length >= 16) break;
+      }
+    }
+  }
+
   // Pick a diverse set of guides for the homepage
   const uniqueCities = Array.from(new Set(seoPages.map((p) => p.city).filter(Boolean)));
   const homepageGuides = uniqueCities
@@ -54,26 +73,9 @@ export default async function HomePage() {
 
       <Hero />
 
-      {/* Near Me */}
-      <NearbyListings />
-
-      {/* Featured Listings */}
-      {featuredListings.length > 0 && (
-        <section className="py-10 sm:py-16 bg-white" id="featured">
-          <div className="container">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
-              Featured Listings
-            </h2>
-            <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
-              Discover top-rated local businesses and services
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              {featuredListings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} />
-              ))}
-            </div>
-          </div>
-        </section>
+      {/* Featured / Near Me (unified section) */}
+      {diverseFeatured.length > 0 && (
+        <NearbyListings featuredListings={diverseFeatured} />
       )}
 
       {/* Browse by City */}
