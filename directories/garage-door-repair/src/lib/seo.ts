@@ -34,6 +34,26 @@ export function generateListingJsonLd(listing: Listing) {
         },
       }),
     ...(listing.priceRange && { priceRange: listing.priceRange }),
+    ...(listing.services &&
+      listing.services.length > 0 && {
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "Services",
+          itemListElement: listing.services.map((service) => ({
+            "@type": "OfferCatalog",
+            name: service,
+            itemListElement: [
+              {
+                "@type": "Offer",
+                itemOffered: {
+                  "@type": "Service",
+                  name: service,
+                },
+              },
+            ],
+          })),
+        },
+      }),
   };
 }
 

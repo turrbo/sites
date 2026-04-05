@@ -25,6 +25,7 @@ export interface Listing {
   featured?: boolean;
   published?: boolean;
   tags?: string[];
+  services?: string[];
 }
 
 export interface Category {

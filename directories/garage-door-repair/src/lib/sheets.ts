@@ -207,6 +207,7 @@ function mapListing(row: SheetRow): Listing {
     featured: row["Featured"] ? parseBoolean(row["Featured"]) : undefined,
     published: row["Published"] ? parseBoolean(row["Published"]) : true,
     tags: parseList(row["Tags"]),
+    services: parseList(row["Services"]),
   };
 }
 

@@ -134,6 +134,24 @@ export default async function ListingPage({ params }: Props) {
               </div>
             )}
 
+            {/* Services */}
+            {listing.services && listing.services.length > 0 && (
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">Services Offered</h2>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {listing.services.map((service) => (
+                    <li
+                      key={service}
+                      className="flex items-center gap-2 text-gray-700"
+                    >
+                      <span className="text-blue-500 text-sm">&#9679;</span>
+                      {service}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Amenities */}
             {listing.amenities && listing.amenities.length > 0 && (
               <div>
