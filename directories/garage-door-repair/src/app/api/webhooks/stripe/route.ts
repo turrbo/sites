@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-04-10",
-});
-
-const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET!;
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY || "");
+}
 
 // Google Sheets write helpers
-const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID!;
-const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!;
 const GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || "").replace(
   /\\n/g,
   "\n"
@@ -27,7 +23,7 @@ async function createWriteJWT(): Promise<string> {
   const now = Math.floor(Date.now() / 1000);
   const header = { alg: "RS256", typ: "JWT" };
   const payload = {
-    iss: GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    iss: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || "",
     scope: "https://www.googleapis.com/auth/spreadsheets",
     aud: "https://oauth2.googleapis.com/token",
     iat: now,
@@ -94,7 +90,8 @@ async function appendToSheet(metadata: Record<string, string>) {
   const token = await getWriteToken();
   const tab = process.env.SHEETS_LISTINGS_TAB || "Listings";
   const range = encodeURIComponent(tab);
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID || "";
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
 
   const slug = slugify(`${metadata.businessName}-${metadata.city}-${metadata.state}`);
   const stateFull = STATE_NAMES[metadata.state] || metadata.state;
@@ -162,7 +159,7 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, sig, WEBHOOK_SECRET);
+    event = getStripe().webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET || "");
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Webhook verification failed";
     console.error("Webhook signature verification failed:", message);

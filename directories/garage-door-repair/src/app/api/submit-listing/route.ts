@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-04-10",
-});
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY || "");
+}
 
 const PRICE_MAP: Record<string, { amount: number; label: string }> = {
   basic: { amount: 9900, label: "Basic Listing - 1 Year" },
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     const priceInfo = PRICE_MAP[plan];
 
     // Create Stripe Checkout session
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       payment_method_types: ["card"],
       customer_email: email,
       line_items: [
