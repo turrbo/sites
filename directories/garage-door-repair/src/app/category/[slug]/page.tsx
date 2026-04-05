@@ -40,10 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export async function generateStaticParams() {
-  const categories = await getAllCategories();
-  return categories.map((c) => ({ slug: c.slug }));
-}
+// Skip generateStaticParams to reduce Sheets API calls at build time.
 
 export default async function CategoryPage({ params }: Props) {
   const categories = await getAllCategories();

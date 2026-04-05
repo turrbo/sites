@@ -129,27 +129,28 @@ interface SheetRow {
   [key: string]: string;
 }
 
-async function fetchSheet(sheetName: string): Promise<SheetRow[]> {
-  const token = await getAccessToken();
-  const range = encodeURIComponent(`${sheetName}`);
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}`;
-
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-    next: { revalidate: 3600 },
-  });
-
-  if (!res.ok) {
-    throw new Error(
-      `Google Sheets error: ${res.status} ${await res.text()}`
-    );
+/** Retry-aware fetch: backs off on 429 (rate limit) errors */
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  retries = 3
+): Promise<Response> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const res = await fetch(url, options);
+    if (res.status === 429 && attempt < retries) {
+      const wait = Math.pow(2, attempt + 1) * 1000; // 2s, 4s, 8s
+      await new Promise((r) => setTimeout(r, wait));
+      continue;
+    }
+    return res;
   }
+  // Should never reach here, but TypeScript needs it
+  return fetch(url, options);
+}
 
-  const data = await res.json();
+function parseRows(data: { values?: string[][] }): SheetRow[] {
   const rows: string[][] = data.values || [];
-
   if (rows.length < 2) return [];
-
   const headers = rows[0];
   return rows.slice(1).map((row) => {
     const obj: SheetRow = {};
@@ -158,6 +159,25 @@ async function fetchSheet(sheetName: string): Promise<SheetRow[]> {
     });
     return obj;
   });
+}
+
+async function fetchSheet(sheetName: string): Promise<SheetRow[]> {
+  const token = await getAccessToken();
+  const range = encodeURIComponent(`${sheetName}`);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}`;
+
+  const res = await fetchWithRetry(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    next: { revalidate: 3600 },
+  } as RequestInit);
+
+  if (!res.ok) {
+    throw new Error(
+      `Google Sheets error: ${res.status} ${await res.text()}`
+    );
+  }
+
+  return parseRows(await res.json());
 }
 
 /**
@@ -176,10 +196,10 @@ async function fetchSheetUncached(sheetName: string): Promise<SheetRow[]> {
   const range = encodeURIComponent(`${sheetName}`);
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}`;
 
-  const res = await fetch(url, {
+  const res = await fetchWithRetry(url, {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
-  });
+  } as RequestInit);
 
   if (!res.ok) {
     throw new Error(
@@ -187,19 +207,7 @@ async function fetchSheetUncached(sheetName: string): Promise<SheetRow[]> {
     );
   }
 
-  const data = await res.json();
-  const rows: string[][] = data.values || [];
-
-  if (rows.length < 2) return [];
-
-  const headers = rows[0];
-  const result = rows.slice(1).map((row) => {
-    const obj: SheetRow = {};
-    headers.forEach((h, i) => {
-      obj[h] = row[i] || "";
-    });
-    return obj;
-  });
+  const result = parseRows(await res.json());
 
   seoPagesCacheData = { rows: result, expires: Date.now() + 3600 * 1000 };
   return result;
@@ -216,10 +224,10 @@ async function fetchSheetColumns(sheetName: string, ranges: string[]): Promise<S
     .join("&");
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?${rangeParams}`;
 
-  const res = await fetch(url, {
+  const res = await fetchWithRetry(url, {
     headers: { Authorization: `Bearer ${token}` },
     next: { revalidate: 3600 },
-  });
+  } as RequestInit);
 
   if (!res.ok) {
     throw new Error(

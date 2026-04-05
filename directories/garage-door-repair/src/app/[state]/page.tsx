@@ -38,10 +38,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export async function generateStaticParams() {
-  const stateGroups = await getStateGroups();
-  return stateGroups.map((s) => ({ state: s.state.toLowerCase() }));
-}
+// Skip generateStaticParams — 50 state pages each trigger multiple Sheets
+// API calls, exceeding the 60 req/min quota. On-demand ISR instead.
 
 export default async function StatePage({ params }: Props) {
   const [stateGroups, seoPages] = await Promise.all([

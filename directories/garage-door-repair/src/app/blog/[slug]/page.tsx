@@ -47,10 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export async function generateStaticParams() {
-  const posts = await getBlogPosts();
-  return posts.map((p) => ({ slug: p.slug }));
-}
+// Skip generateStaticParams to reduce Sheets API calls at build time.
 
 export default async function BlogPostPage({ params }: Props) {
   const [post, allPosts, seoPages, cityGroups, stateGroups] = await Promise.all(
