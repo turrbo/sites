@@ -5,7 +5,7 @@ import {
   getAllCategories,
   getCityGroups,
   getStateGroups,
-  getSEOPages,
+  getSEOPagesMeta,
   getBlogPosts,
 } from "@/lib/sheets";
 
@@ -20,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       getAllCategories(),
       getCityGroups(),
       getStateGroups(),
-      getSEOPages(),
+      getSEOPagesMeta(),
       getBlogPosts(),
     ]);
 

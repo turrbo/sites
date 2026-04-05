@@ -6,7 +6,7 @@ import { siteConfig } from "@/config/site";
 import {
   getBlogPostBySlug,
   getBlogPosts,
-  getSEOPages,
+  getSEOPagesMeta,
   getCityGroups,
   getStateGroups,
 } from "@/lib/sheets";
@@ -57,7 +57,7 @@ export default async function BlogPostPage({ params }: Props) {
     [
       getBlogPostBySlug(params.slug),
       getBlogPosts(),
-      getSEOPages(),
+      getSEOPagesMeta(),
       getCityGroups(),
       getStateGroups(),
     ]

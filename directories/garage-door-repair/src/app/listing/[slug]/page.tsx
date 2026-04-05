@@ -7,7 +7,7 @@ import {
   getListingBySlug,
   getAllListings,
   getListingsByCity,
-  getSEOPages,
+  getSEOPagesMeta,
   slugify,
 } from "@/lib/sheets";
 import {
@@ -60,7 +60,7 @@ export default async function ListingPage({ params }: Props) {
 
   const [cityListings, seoPages] = await Promise.all([
     getListingsByCity(listing.city, listing.state),
-    getSEOPages(),
+    getSEOPagesMeta(),
   ]);
 
   const relatedListings = cityListings.filter((l) => l.slug !== listing.slug).slice(0, 4);

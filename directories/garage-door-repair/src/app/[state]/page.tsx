@@ -4,7 +4,7 @@ import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import {
   getStateGroups,
-  getSEOPages,
+  getSEOPagesMeta,
 } from "@/lib/sheets";
 import { generateBreadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
@@ -46,7 +46,7 @@ export async function generateStaticParams() {
 export default async function StatePage({ params }: Props) {
   const [stateGroups, seoPages] = await Promise.all([
     getStateGroups(),
-    getSEOPages(),
+    getSEOPagesMeta(),
   ]);
 
   const stateGroup = stateGroups.find(

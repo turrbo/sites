@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
-import { getSEOPageBySlug, getSEOPages, getCityGroups, getStateGroups } from "@/lib/sheets";
+import { getSEOPageBySlug, getSEOPagesMeta, getCityGroups, getStateGroups } from "@/lib/sheets";
 import {
   generateBreadcrumbJsonLd,
   generateFAQJsonLd,
@@ -124,14 +124,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const pages = await getSEOPages();
+  const pages = await getSEOPagesMeta();
   return pages.map((p) => ({ slug: p.slug }));
 }
 
 export default async function GuidePage({ params }: Props) {
   const [page, allPages, cityGroups, stateGroups] = await Promise.all([
     getSEOPageBySlug(params.slug),
-    getSEOPages(),
+    getSEOPagesMeta(),
     getCityGroups(),
     getStateGroups(),
   ]);

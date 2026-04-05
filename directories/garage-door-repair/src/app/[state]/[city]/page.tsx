@@ -6,7 +6,7 @@ import {
   getListingsByCity,
   getCityGroups,
   getStateGroups,
-  getSEOPages,
+  getSEOPagesMeta,
   slugify,
 } from "@/lib/sheets";
 import { generateBreadcrumbJsonLd, generateItemListJsonLd } from "@/lib/seo";
@@ -62,7 +62,7 @@ export default async function CityPage({ params }: Props) {
   const [listings, stateGroups, seoPages] = await Promise.all([
     getListingsByCity(cityGroup.city, cityGroup.state),
     getStateGroups(),
-    getSEOPages(),
+    getSEOPagesMeta(),
   ]);
 
   const stateGroup = stateGroups.find(

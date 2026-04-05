@@ -160,6 +160,61 @@ async function fetchSheet(sheetName: string): Promise<SheetRow[]> {
   });
 }
 
+/**
+ * Fetch specific column ranges from a sheet to stay under Vercel's 2MB data cache limit.
+ * Uses batchGet to fetch multiple ranges in one request.
+ */
+async function fetchSheetColumns(sheetName: string, ranges: string[]): Promise<SheetRow[]> {
+  const token = await getAccessToken();
+  const rangeParams = ranges
+    .map((r) => `ranges=${encodeURIComponent(`${sheetName}!${r}`)}`)
+    .join("&");
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?${rangeParams}`;
+
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    next: { revalidate: 3600 },
+  });
+
+  if (!res.ok) {
+    throw new Error(
+      `Google Sheets error: ${res.status} ${await res.text()}`
+    );
+  }
+
+  const data = await res.json();
+  const valueRanges: { values: string[][] }[] = data.valueRanges || [];
+
+  if (valueRanges.length === 0) return [];
+
+  // Merge columns from multiple ranges back into unified rows
+  // Each valueRange contains rows for its column range
+  const maxRows = Math.max(...valueRanges.map((vr) => (vr.values || []).length));
+  if (maxRows < 2) return [];
+
+  // Build headers and rows by concatenating across ranges
+  const headers: string[] = [];
+  const mergedRows: string[][] = Array.from({ length: maxRows - 1 }, () => []);
+
+  for (const vr of valueRanges) {
+    const vals = vr.values || [];
+    const rangeHeaders = vals[0] || [];
+    headers.push(...rangeHeaders);
+    for (let i = 1; i < maxRows; i++) {
+      const row = vals[i] || [];
+      mergedRows[i - 1].push(...rangeHeaders.map((_, ci) => row[ci] || ""));
+    }
+  }
+
+  return mergedRows.map((row) => {
+    const obj: SheetRow = {};
+    headers.forEach((h, i) => {
+      obj[h] = row[i] || "";
+    });
+    return obj;
+  });
+}
+
 // --- Row Mappers ---
 
 function parseBoolean(val: string): boolean {
@@ -377,6 +432,22 @@ export async function getAllCategories(): Promise<Category[]> {
 export async function getSEOPages(): Promise<SEOPage[]> {
   try {
     const rows = await fetchSheet(SEO_PAGES_SHEET);
+    return rows.map(mapSEOPage).filter((p) => p.published !== false);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Lightweight version of getSEOPages that skips the Content column.
+ * Use this on pages that only need metadata (city pages, state pages, listings)
+ * to stay under Vercel's 2MB data cache limit.
+ * SEO Pages columns: A=Title, B=Slug, C=Type, D=Content, E=Category, F=City, G=State, H=Meta Title, I=Meta Description, J=Published
+ */
+export async function getSEOPagesMeta(): Promise<SEOPage[]> {
+  try {
+    // Fetch A:C (Title, Slug, Type) and E:J (Category through Published), skipping D (Content)
+    const rows = await fetchSheetColumns(SEO_PAGES_SHEET, ["A:C", "E:J"]);
     return rows.map(mapSEOPage).filter((p) => p.published !== false);
   } catch {
     return [];

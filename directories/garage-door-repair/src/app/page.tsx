@@ -5,7 +5,7 @@ import {
   getFeaturedListings,
   getCityGroups,
   getAllListings,
-  getSEOPages,
+  getSEOPagesMeta,
 } from "@/lib/sheets";
 import { generateItemListJsonLd } from "@/lib/seo";
 import Hero from "@/components/Hero";
@@ -32,7 +32,7 @@ export default async function HomePage() {
       getFeaturedListings(),
       getCityGroups(),
       getAllListings(),
-      getSEOPages(),
+      getSEOPagesMeta(),
     ]);
 
   // Pick a diverse set of guides for the homepage
