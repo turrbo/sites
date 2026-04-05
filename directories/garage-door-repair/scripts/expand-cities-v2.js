@@ -50,38 +50,147 @@ if (!API_KEY) {
 }
 
 // ─── New cities to add ───────────────────────────────────────────────
-// 17 missing states + major metros we skipped
+// Batch 3: 100 additional cities — suburbs, mid-size metros, growth markets
 const NEW_CITIES = [
-  // Missing states (1 city each)
-  { city: "Birmingham", state: "AL", stateFull: "Alabama" },
-  { city: "Anchorage", state: "AK", stateFull: "Alaska" },
-  { city: "Little Rock", state: "AR", stateFull: "Arkansas" },
-  { city: "Hartford", state: "CT", stateFull: "Connecticut" },
-  { city: "Wilmington", state: "DE", stateFull: "Delaware" },
-  { city: "Portland", state: "ME", stateFull: "Maine" },
-  { city: "Jackson", state: "MS", stateFull: "Mississippi" },
-  { city: "Billings", state: "MT", stateFull: "Montana" },
-  { city: "Manchester", state: "NH", stateFull: "New Hampshire" },
-  { city: "Fargo", state: "ND", stateFull: "North Dakota" },
-  { city: "Providence", state: "RI", stateFull: "Rhode Island" },
-  { city: "Charleston", state: "SC", stateFull: "South Carolina" },
-  { city: "Sioux Falls", state: "SD", stateFull: "South Dakota" },
-  { city: "Salt Lake City", state: "UT", stateFull: "Utah" },
-  { city: "Burlington", state: "VT", stateFull: "Vermont" },
-  { city: "Charleston", state: "WV", stateFull: "West Virginia" },
-  { city: "Cheyenne", state: "WY", stateFull: "Wyoming" },
-  // Major metros we missed
-  { city: "San Jose", state: "CA", stateFull: "California" },
-  { city: "Detroit", state: "MI", stateFull: "Michigan" },
-  { city: "Plano", state: "TX", stateFull: "Texas" },
-  { city: "Knoxville", state: "TN", stateFull: "Tennessee" },
-  { city: "Savannah", state: "GA", stateFull: "Georgia" },
-  { city: "Chattanooga", state: "TN", stateFull: "Tennessee" },
-  { city: "Provo", state: "UT", stateFull: "Utah" },
-  { city: "Columbia", state: "SC", stateFull: "South Carolina" },
-  { city: "Mobile", state: "AL", stateFull: "Alabama" },
-  { city: "Huntsville", state: "AL", stateFull: "Alabama" },
-  { city: "Boise", state: "ID", stateFull: "Idaho" }, // already exists but just in case
+  // California suburbs & mid-size
+  { city: "Ontario", state: "CA", stateFull: "California" },
+  { city: "Rancho Cucamonga", state: "CA", stateFull: "California" },
+  { city: "Oceanside", state: "CA", stateFull: "California" },
+  { city: "Elk Grove", state: "CA", stateFull: "California" },
+  { city: "Roseville", state: "CA", stateFull: "California" },
+  { city: "Hayward", state: "CA", stateFull: "California" },
+  { city: "Escondido", state: "CA", stateFull: "California" },
+  { city: "Sunnyvale", state: "CA", stateFull: "California" },
+  { city: "Pomona", state: "CA", stateFull: "California" },
+  { city: "Visalia", state: "CA", stateFull: "California" },
+  // Texas suburbs & mid-size
+  { city: "McKinney", state: "TX", stateFull: "Texas" },
+  { city: "Frisco", state: "TX", stateFull: "Texas" },
+  { city: "Pasadena", state: "TX", stateFull: "Texas" },
+  { city: "Killeen", state: "TX", stateFull: "Texas" },
+  { city: "McAllen", state: "TX", stateFull: "Texas" },
+  { city: "Midland", state: "TX", stateFull: "Texas" },
+  { city: "Denton", state: "TX", stateFull: "Texas" },
+  { city: "Round Rock", state: "TX", stateFull: "Texas" },
+  { city: "Amarillo", state: "TX", stateFull: "Texas" },
+  { city: "Brownsville", state: "TX", stateFull: "Texas" },
+  // Florida suburbs & mid-size
+  { city: "Cape Coral", state: "FL", stateFull: "Florida" },
+  { city: "Tallahassee", state: "FL", stateFull: "Florida" },
+  { city: "Fort Lauderdale", state: "FL", stateFull: "Florida" },
+  { city: "Pembroke Pines", state: "FL", stateFull: "Florida" },
+  { city: "Hollywood", state: "FL", stateFull: "Florida" },
+  { city: "Gainesville", state: "FL", stateFull: "Florida" },
+  { city: "Clearwater", state: "FL", stateFull: "Florida" },
+  { city: "Palm Bay", state: "FL", stateFull: "Florida" },
+  // Arizona suburbs
+  { city: "Tempe", state: "AZ", stateFull: "Arizona" },
+  { city: "Surprise", state: "AZ", stateFull: "Arizona" },
+  { city: "Peoria", state: "AZ", stateFull: "Arizona" },
+  { city: "Goodyear", state: "AZ", stateFull: "Arizona" },
+  // Georgia
+  { city: "Augusta", state: "GA", stateFull: "Georgia" },
+  { city: "Macon", state: "GA", stateFull: "Georgia" },
+  { city: "Roswell", state: "GA", stateFull: "Georgia" },
+  // North Carolina
+  { city: "Fayetteville", state: "NC", stateFull: "North Carolina" },
+  { city: "Wilmington", state: "NC", stateFull: "North Carolina" },
+  { city: "Cary", state: "NC", stateFull: "North Carolina" },
+  { city: "Asheville", state: "NC", stateFull: "North Carolina" },
+  // Ohio
+  { city: "Akron", state: "OH", stateFull: "Ohio" },
+  { city: "Dayton", state: "OH", stateFull: "Ohio" },
+  { city: "Canton", state: "OH", stateFull: "Ohio" },
+  // Michigan
+  { city: "Grand Rapids", state: "MI", stateFull: "Michigan" },
+  { city: "Warren", state: "MI", stateFull: "Michigan" },
+  { city: "Sterling Heights", state: "MI", stateFull: "Michigan" },
+  { city: "Ann Arbor", state: "MI", stateFull: "Michigan" },
+  // Virginia
+  { city: "Alexandria", state: "VA", stateFull: "Virginia" },
+  { city: "Hampton", state: "VA", stateFull: "Virginia" },
+  { city: "Newport News", state: "VA", stateFull: "Virginia" },
+  // Indiana
+  { city: "Evansville", state: "IN", stateFull: "Indiana" },
+  { city: "South Bend", state: "IN", stateFull: "Indiana" },
+  { city: "Carmel", state: "IN", stateFull: "Indiana" },
+  // Colorado
+  { city: "Lakewood", state: "CO", stateFull: "Colorado" },
+  { city: "Thornton", state: "CO", stateFull: "Colorado" },
+  { city: "Fort Collins", state: "CO", stateFull: "Colorado" },
+  // Tennessee
+  { city: "Clarksville", state: "TN", stateFull: "Tennessee" },
+  { city: "Murfreesboro", state: "TN", stateFull: "Tennessee" },
+  // Washington
+  { city: "Vancouver", state: "WA", stateFull: "Washington" },
+  { city: "Bellevue", state: "WA", stateFull: "Washington" },
+  { city: "Kent", state: "WA", stateFull: "Washington" },
+  // Oregon
+  { city: "Eugene", state: "OR", stateFull: "Oregon" },
+  { city: "Salem", state: "OR", stateFull: "Oregon" },
+  // Nevada
+  { city: "Sparks", state: "NV", stateFull: "Nevada" },
+  // Missouri
+  { city: "Springfield", state: "MO", stateFull: "Missouri" },
+  { city: "Independence", state: "MO", stateFull: "Missouri" },
+  // Minnesota
+  { city: "Rochester", state: "MN", stateFull: "Minnesota" },
+  { city: "Bloomington", state: "MN", stateFull: "Minnesota" },
+  // Wisconsin
+  { city: "Green Bay", state: "WI", stateFull: "Wisconsin" },
+  { city: "Kenosha", state: "WI", stateFull: "Wisconsin" },
+  // New Jersey
+  { city: "Paterson", state: "NJ", stateFull: "New Jersey" },
+  { city: "Elizabeth", state: "NJ", stateFull: "New Jersey" },
+  { city: "Trenton", state: "NJ", stateFull: "New Jersey" },
+  // Pennsylvania
+  { city: "Allentown", state: "PA", stateFull: "Pennsylvania" },
+  { city: "Erie", state: "PA", stateFull: "Pennsylvania" },
+  { city: "Reading", state: "PA", stateFull: "Pennsylvania" },
+  // Illinois
+  { city: "Naperville", state: "IL", stateFull: "Illinois" },
+  { city: "Rockford", state: "IL", stateFull: "Illinois" },
+  { city: "Joliet", state: "IL", stateFull: "Illinois" },
+  // Maryland
+  { city: "Columbia", state: "MD", stateFull: "Maryland" },
+  { city: "Frederick", state: "MD", stateFull: "Maryland" },
+  // Massachusetts
+  { city: "Worcester", state: "MA", stateFull: "Massachusetts" },
+  { city: "Springfield", state: "MA", stateFull: "Massachusetts" },
+  // Louisiana
+  { city: "Shreveport", state: "LA", stateFull: "Louisiana" },
+  { city: "Lafayette", state: "LA", stateFull: "Louisiana" },
+  // Kentucky
+  { city: "Bowling Green", state: "KY", stateFull: "Kentucky" },
+  // Oklahoma
+  { city: "Norman", state: "OK", stateFull: "Oklahoma" },
+  { city: "Broken Arrow", state: "OK", stateFull: "Oklahoma" },
+  // Kansas
+  { city: "Overland Park", state: "KS", stateFull: "Kansas" },
+  { city: "Olathe", state: "KS", stateFull: "Kansas" },
+  // Iowa
+  { city: "Cedar Rapids", state: "IA", stateFull: "Iowa" },
+  { city: "Davenport", state: "IA", stateFull: "Iowa" },
+  // Nebraska
+  { city: "Bellevue", state: "NE", stateFull: "Nebraska" },
+  // Arkansas
+  { city: "Fayetteville", state: "AR", stateFull: "Arkansas" },
+  { city: "Fort Smith", state: "AR", stateFull: "Arkansas" },
+  // Mississippi
+  { city: "Gulfport", state: "MS", stateFull: "Mississippi" },
+  // Alabama
+  { city: "Montgomery", state: "AL", stateFull: "Alabama" },
+  { city: "Tuscaloosa", state: "AL", stateFull: "Alabama" },
+  // South Carolina
+  { city: "Greenville", state: "SC", stateFull: "South Carolina" },
+  { city: "North Charleston", state: "SC", stateFull: "South Carolina" },
+  // New York
+  { city: "Rochester", state: "NY", stateFull: "New York" },
+  { city: "Syracuse", state: "NY", stateFull: "New York" },
+  { city: "Yonkers", state: "NY", stateFull: "New York" },
+  // Connecticut
+  { city: "New Haven", state: "CT", stateFull: "Connecticut" },
+  { city: "Stamford", state: "CT", stateFull: "Connecticut" },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────
