@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
+import Link from "next/link";
 import {
   getFeaturedListings,
   getAllCategories,
   getCityGroups,
   getAllListings,
+  getSEOPages,
 } from "@/lib/sheets";
 import { generateItemListJsonLd } from "@/lib/seo";
 import Hero from "@/components/Hero";
@@ -27,13 +29,21 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [featuredListings, categories, cityGroups, allListings] =
+  const [featuredListings, categories, cityGroups, allListings, seoPages] =
     await Promise.all([
       getFeaturedListings(),
       getAllCategories(),
       getCityGroups(),
       getAllListings(),
+      getSEOPages(),
     ]);
+
+  // Pick a diverse set of guides for the homepage
+  const uniqueCities = Array.from(new Set(seoPages.map((p) => p.city).filter(Boolean)));
+  const homepageGuides = uniqueCities
+    .map((city) => seoPages.find((p) => p.city === city))
+    .filter(Boolean)
+    .slice(0, 10);
 
   const itemListJsonLd = generateItemListJsonLd(
     `Featured listings on ${siteConfig.name}`,
@@ -48,15 +58,15 @@ export default async function HomePage() {
 
       {/* Featured Listings */}
       {featuredListings.length > 0 && (
-        <section className="py-16 bg-white" id="featured">
+        <section className="py-10 sm:py-16 bg-white" id="featured">
           <div className="container">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
               Featured Listings
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
               Discover top-rated local businesses and services
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {featuredListings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}
@@ -67,15 +77,15 @@ export default async function HomePage() {
 
       {/* Browse by Category */}
       {categories.length > 0 && (
-        <section className="py-16 bg-gray-50" id="categories">
+        <section className="py-10 sm:py-16 bg-gray-50" id="categories">
           <div className="container">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
               Browse by Category
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
               Find businesses by what they do
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
               {categories.map((category) => (
                 <CategoryCard key={category.id} category={category} />
               ))}
@@ -86,17 +96,51 @@ export default async function HomePage() {
 
       {/* Browse by City */}
       {cityGroups.length > 0 && (
-        <section className="py-16 bg-white" id="cities">
+        <section className="py-10 sm:py-16 bg-white" id="cities">
           <div className="container">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
               Browse by City
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
               Explore listings in your area
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
               {cityGroups.slice(0, 20).map((city) => (
                 <CityCard key={`${city.city}-${city.state}`} cityGroup={city} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+      {/* Guides & Resources */}
+      {homepageGuides.length > 0 && (
+        <section className="py-10 sm:py-16 bg-gray-50" id="guides">
+          <div className="container">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
+              Garage Door Repair Guides
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
+              Expert guides and cost information for your city
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {homepageGuides.map((guide) => guide && (
+                <Link
+                  key={guide.slug}
+                  href={`/guides/${guide.slug}`}
+                  className="block p-4 sm:p-5 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all group"
+                >
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                    {guide.title}
+                  </h3>
+                  {guide.city && (
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                      {guide.city}, {guide.state}
+                    </p>
+                  )}
+                  <span className="inline-block mt-2 text-xs text-blue-600 font-medium">
+                    Read guide →
+                  </span>
+                </Link>
               ))}
             </div>
           </div>

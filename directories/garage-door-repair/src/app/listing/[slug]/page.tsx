@@ -6,6 +6,8 @@ import { siteConfig } from "@/config/site";
 import {
   getListingBySlug,
   getAllListings,
+  getListingsByCity,
+  getSEOPages,
   slugify,
 } from "@/lib/sheets";
 import {
@@ -48,9 +50,21 @@ export async function generateStaticParams() {
   return listings.map((l) => ({ slug: l.slug }));
 }
 
+function stripHtml(text: string): string {
+  return text.replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'");
+}
+
 export default async function ListingPage({ params }: Props) {
   const listing = await getListingBySlug(params.slug);
   if (!listing) notFound();
+
+  const [cityListings, seoPages] = await Promise.all([
+    getListingsByCity(listing.city, listing.state),
+    getSEOPages(),
+  ]);
+
+  const relatedListings = cityListings.filter((l) => l.slug !== listing.slug).slice(0, 4);
+  const cityGuides = seoPages.filter((p) => p.city === listing.city).slice(0, 4);
 
   const categorySlug = slugify(listing.category);
 
@@ -68,12 +82,12 @@ export default async function ListingPage({ params }: Props) {
       <JsonLd data={listingJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
 
-      <div className="container py-8">
+      <div className="container py-4 sm:py-8">
         <Breadcrumbs items={breadcrumbItems} />
 
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="mt-4 sm:mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Image */}
             {listing.imageUrl && (
               <div className="relative w-full h-64 sm:h-80 rounded-xl overflow-hidden">
@@ -92,7 +106,7 @@ export default async function ListingPage({ params }: Props) {
               <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full mb-3">
                 {listing.category}
               </span>
-              <h1 className="text-3xl font-bold text-gray-900">{listing.name}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{listing.name}</h1>
 
               {listing.rating !== undefined && (
                 <div className="flex items-center gap-2 mt-2">
@@ -116,7 +130,7 @@ export default async function ListingPage({ params }: Props) {
             {listing.description && (
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">About</h2>
-                <p className="text-gray-700 leading-relaxed">{listing.description}</p>
+                <p className="text-gray-700 leading-relaxed">{stripHtml(listing.description)}</p>
               </div>
             )}
 
@@ -255,6 +269,78 @@ export default async function ListingPage({ params }: Props) {
           </aside>
         </div>
       </div>
+      {/* Related Listings in Same City */}
+      {relatedListings.length > 0 && (
+        <section className="container py-8 sm:py-12">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+            More Garage Door Services in {listing.city}, {listing.state}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {relatedListings.map((rl) => (
+              <Link
+                key={rl.slug}
+                href={`/listing/${rl.slug}`}
+                className="block p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
+              >
+                <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">{rl.name}</h3>
+                {rl.rating != null && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    {rl.rating.toFixed(1)} stars · {rl.reviewCount || 0} reviews
+                  </p>
+                )}
+                {rl.phone && <p className="text-xs text-blue-600 mt-1">{rl.phone}</p>}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* City Guides */}
+      {cityGuides.length > 0 && (
+        <section className="container pb-8 sm:pb-12">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+            Garage Door Guides for {listing.city}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {cityGuides.map((guide) => (
+              <Link
+                key={guide.slug}
+                href={`/guides/${guide.slug}`}
+                className="block p-4 bg-gray-50 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-white transition-all"
+              >
+                <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">{guide.title}</h3>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Mobile sticky CTA */}
+      {listing.phone && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 lg:hidden z-40">
+          <div className="flex gap-2 max-w-lg mx-auto">
+            <a
+              href={`tel:${listing.phone}`}
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              Call Now
+            </a>
+            {listing.website && (
+              <a
+                href={listing.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-white text-blue-600 font-medium rounded-lg border border-blue-600 hover:bg-blue-50 transition-colors"
+              >
+                Visit Website
+              </a>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }

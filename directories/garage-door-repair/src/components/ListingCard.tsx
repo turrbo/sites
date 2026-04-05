@@ -23,8 +23,13 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
+function stripHtml(text: string): string {
+  return text.replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'");
+}
+
 export default function ListingCard({ listing }: Props) {
-  const displayText = listing.shortDescription || listing.description;
+  const rawText = listing.shortDescription || listing.description;
+  const displayText = stripHtml(rawText);
   const truncated = displayText.length > 120 ? displayText.slice(0, 120).trimEnd() + '…' : displayText;
 
   return (

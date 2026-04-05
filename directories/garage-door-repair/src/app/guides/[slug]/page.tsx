@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { siteConfig } from "@/config/site";
-import { getSEOPageBySlug, getSEOPages } from "@/lib/sheets";
+import { getSEOPageBySlug, getSEOPages, getCityGroups } from "@/lib/sheets";
 import {
   generateBreadcrumbJsonLd,
   generateFAQJsonLd,
@@ -127,8 +128,18 @@ export async function generateStaticParams() {
 }
 
 export default async function GuidePage({ params }: Props) {
-  const page = await getSEOPageBySlug(params.slug);
+  const [page, allPages, cityGroups] = await Promise.all([
+    getSEOPageBySlug(params.slug),
+    getSEOPages(),
+    getCityGroups(),
+  ]);
   if (!page) notFound();
+
+  // Related guides: same city or same topic type
+  const relatedGuides = allPages
+    .filter((p) => p.slug !== page.slug)
+    .filter((p) => (page.city && p.city === page.city) || (!page.city && p.type === page.type))
+    .slice(0, 6);
 
   const breadcrumbItems = [
     { name: "Home", url: "/" },
@@ -161,22 +172,22 @@ export default async function GuidePage({ params }: Props) {
       <JsonLd data={breadcrumbJsonLd} />
       {faqJsonLd && <JsonLd data={faqJsonLd} />}
 
-      <div className="container py-8">
+      <div className="container py-4 sm:py-8">
         <Breadcrumbs items={breadcrumbItems} />
 
-        <article className="mt-6 max-w-3xl">
-          <header className="mb-8">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full capitalize">
+        <article className="mt-4 sm:mt-6 max-w-3xl">
+          <header className="mb-6 sm:mb-8">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs sm:text-sm font-medium rounded-full capitalize">
                 {page.type}
               </span>
               {page.category && (
-                <span className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">
+                <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs sm:text-sm rounded-full">
                   {page.category}
                 </span>
               )}
             </div>
-            <h1 className="text-4xl font-bold text-gray-900">{page.title}</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight">{page.title}</h1>
             {(page.city || page.state) && (
               <p className="text-gray-500 mt-2">
                 {[page.city, page.state].filter(Boolean).join(", ")}
@@ -184,9 +195,10 @@ export default async function GuidePage({ params }: Props) {
             )}
           </header>
 
-          <div className="prose prose-gray max-w-none">
-            {renderMarkdown(mainContent)}
-          </div>
+          <div
+            className="prose prose-gray max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-a:text-blue-600 prose-strong:text-gray-900"
+            dangerouslySetInnerHTML={{ __html: mainContent }}
+          />
 
           {faqs.length > 0 && (
             <div className="mt-10">
@@ -197,6 +209,47 @@ export default async function GuidePage({ params }: Props) {
             </div>
           )}
         </article>
+
+        {/* Related Guides */}
+        {relatedGuides.length > 0 && (
+          <section className="mt-10 sm:mt-16 max-w-3xl">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+              {page.city ? `More Guides for ${page.city}` : "Related Guides"}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {relatedGuides.map((guide) => (
+                <Link
+                  key={guide.slug}
+                  href={`/guides/${guide.slug}`}
+                  className="block p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
+                >
+                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">{guide.title}</h3>
+                  {guide.city && (
+                    <p className="text-xs text-gray-500 mt-1">{guide.city}, {guide.state}</p>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Browse by City */}
+        <section className="mt-10 sm:mt-16 max-w-3xl">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+            Browse Garage Door Repair by City
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {cityGroups.map((cg) => (
+              <Link
+                key={`${cg.city}-${cg.state}`}
+                href={`/${cg.state.toLowerCase()}/${cg.city.toLowerCase().replace(/\s+/g, "-")}`}
+                className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors"
+              >
+                {cg.city}, {cg.state} ({cg.count})
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
     </>
   );

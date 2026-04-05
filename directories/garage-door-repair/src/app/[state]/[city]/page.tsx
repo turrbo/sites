@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import {
   getListingsByCity,
   getCityGroups,
   getStateGroups,
+  getSEOPages,
 } from "@/lib/sheets";
 import { generateBreadcrumbJsonLd, generateItemListJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
@@ -94,6 +96,37 @@ export default async function CityPage({ params }: Props) {
           </p>
 
           <ListingGrid listings={listings} />
+
+          {/* City Guides */}
+          {await (async () => {
+            const guides = (await getSEOPages()).filter(
+              (p) => p.city === cityGroup.city
+            );
+            if (guides.length === 0) return null;
+            return (
+              <section className="mt-10 sm:mt-14">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+                  Garage Door Guides for {cityGroup.city}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {guides.map((guide) => (
+                    <Link
+                      key={guide.slug}
+                      href={`/guides/${guide.slug}`}
+                      className="block p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
+                    >
+                      <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">
+                        {guide.title}
+                      </h3>
+                      <span className="inline-block mt-1 text-xs text-blue-600">
+                        Read guide →
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            );
+          })()}
         </div>
       </div>
     </>
