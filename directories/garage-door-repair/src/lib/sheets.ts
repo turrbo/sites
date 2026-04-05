@@ -308,6 +308,14 @@ function mapListing(row: SheetRow): Listing {
     published: row["Published"] ? parseBoolean(row["Published"]) : true,
     tags: parseList(row["Tags"]),
     services: parseList(row["Services"]),
+    facebook: row["Facebook"] || undefined,
+    instagram: row["Instagram"] || undefined,
+    yelp: row["Yelp"] || undefined,
+    twitter: row["Twitter"] || undefined,
+    youtube: row["YouTube"] || undefined,
+    nextdoor: row["Nextdoor"] || undefined,
+    yearEstablished: parseNumber(row["Year Established"]),
+    galleryUrls: parseList(row["Gallery"]),
   };
 }
 

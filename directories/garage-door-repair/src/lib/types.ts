@@ -26,6 +26,14 @@ export interface Listing {
   published?: boolean;
   tags?: string[];
   services?: string[];
+  facebook?: string;
+  instagram?: string;
+  yelp?: string;
+  twitter?: string;
+  youtube?: string;
+  nextdoor?: string;
+  yearEstablished?: number;
+  galleryUrls?: string[];
 }
 
 export interface Category {

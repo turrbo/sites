@@ -34,6 +34,16 @@ export function generateListingJsonLd(listing: Listing) {
         },
       }),
     ...(listing.priceRange && { priceRange: listing.priceRange }),
+    ...(listing.yearEstablished && { foundingDate: String(listing.yearEstablished) }),
+    ...(() => {
+      const sameAs: string[] = [];
+      if (listing.facebook) sameAs.push(listing.facebook);
+      if (listing.instagram) sameAs.push(listing.instagram);
+      if (listing.yelp) sameAs.push(listing.yelp);
+      if (listing.twitter) sameAs.push(listing.twitter);
+      if (listing.youtube) sameAs.push(listing.youtube);
+      return sameAs.length > 0 ? { sameAs } : {};
+    })(),
     ...(listing.services &&
       listing.services.length > 0 && {
         hasOfferCatalog: {
