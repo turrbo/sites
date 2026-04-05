@@ -23,8 +23,8 @@ export const siteConfig = {
   // Nav links
   nav: [
     { label: "Home", href: "/" },
-    { label: "Categories", href: "/#categories" },
     { label: "Cities", href: "/#cities" },
+    { label: "Guides", href: "/#guides" },
   ],
 
   // Footer links

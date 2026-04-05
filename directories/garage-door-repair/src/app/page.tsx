@@ -3,7 +3,6 @@ import { siteConfig } from "@/config/site";
 import Link from "next/link";
 import {
   getFeaturedListings,
-  getAllCategories,
   getCityGroups,
   getAllListings,
   getSEOPages,
@@ -11,7 +10,6 @@ import {
 import { generateItemListJsonLd } from "@/lib/seo";
 import Hero from "@/components/Hero";
 import ListingCard from "@/components/ListingCard";
-import CategoryCard from "@/components/CategoryCard";
 import CityCard from "@/components/CityCard";
 import JsonLd from "@/components/JsonLd";
 
@@ -29,10 +27,9 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [featuredListings, categories, cityGroups, allListings, seoPages] =
+  const [featuredListings, cityGroups, allListings, seoPages] =
     await Promise.all([
       getFeaturedListings(),
-      getAllCategories(),
       getCityGroups(),
       getAllListings(),
       getSEOPages(),
@@ -69,25 +66,6 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {featuredListings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Browse by Category */}
-      {categories.length > 0 && (
-        <section className="py-10 sm:py-16 bg-gray-50" id="categories">
-          <div className="container">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
-              Browse by Category
-            </h2>
-            <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
-              Find businesses by what they do
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-              {categories.map((category) => (
-                <CategoryCard key={category.id} category={category} />
               ))}
             </div>
           </div>
