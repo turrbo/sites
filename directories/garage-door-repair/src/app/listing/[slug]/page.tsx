@@ -45,10 +45,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export async function generateStaticParams() {
-  const listings = await getAllListings();
-  return listings.map((l) => ({ slug: l.slug }));
-}
+// Skip generateStaticParams — 1600+ listings exceed Google Sheets API
+// rate limits at build time (429 quota errors). Pages render on-demand
+// with ISR (revalidate = 3600) instead.
 
 function stripHtml(text: string): string {
   return text.replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'");

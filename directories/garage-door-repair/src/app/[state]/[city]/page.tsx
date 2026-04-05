@@ -47,13 +47,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export async function generateStaticParams() {
-  const cityGroups = await getCityGroups();
-  return cityGroups.map((cg) => ({
-    state: cg.state.toLowerCase(),
-    city: cg.slug.split("/")[1],
-  }));
-}
+// Skip generateStaticParams — 227+ cities cause Google Sheets API
+// rate limit errors (429) at build time. Pages render on-demand
+// with ISR (revalidate = 3600) instead.
 
 export default async function CityPage({ params }: Props) {
   const cityGroup = await resolveCityGroup(params.state, params.city);
