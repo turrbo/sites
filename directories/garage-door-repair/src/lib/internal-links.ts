@@ -116,19 +116,6 @@ function buildLinkTargets(ctx: LinkContext): LinkTarget[] {
     });
   }
 
-  // 4. Service-related keyword links to category pages
-  const serviceLinks: [string, string][] = [
-    ["garage door repair", "/category/garage-door-repair"],
-    ["garage door installation", "/category/garage-door-installation"],
-    ["spring replacement", "/category/spring-replacement"],
-    ["opener repair", "/category/garage-door-opener-repair"],
-    ["opener installation", "/category/garage-door-opener-installation"],
-  ];
-
-  for (const [text, href] of serviceLinks) {
-    targets.push({ text, href, priority: 6 });
-  }
-
   return targets;
 }
 
