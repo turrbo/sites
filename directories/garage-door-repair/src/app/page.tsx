@@ -9,6 +9,7 @@ import {
 } from "@/lib/sheets";
 import { generateItemListJsonLd } from "@/lib/seo";
 import Hero from "@/components/Hero";
+import NearbyListings from "@/components/NearbyListings";
 import ListingCard from "@/components/ListingCard";
 import CityCard from "@/components/CityCard";
 import JsonLd from "@/components/JsonLd";
@@ -52,6 +53,9 @@ export default async function HomePage() {
       <JsonLd data={itemListJsonLd} />
 
       <Hero />
+
+      {/* Near Me */}
+      <NearbyListings />
 
       {/* Featured Listings */}
       {featuredListings.length > 0 && (
