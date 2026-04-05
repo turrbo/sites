@@ -136,12 +136,6 @@ export default async function GuidePage({ params }: Props) {
   ]);
   if (!page) notFound();
 
-  // Related guides: same city or same topic type
-  const relatedGuides = allPages
-    .filter((p) => p.slug !== page.slug)
-    .filter((p) => (page.city && p.city === page.city) || (!page.city && p.type === page.type))
-    .slice(0, 6);
-
   const breadcrumbItems = [
     { name: "Home", url: "/" },
     { name: "Guides", url: "/guides" },
@@ -225,35 +219,12 @@ export default async function GuidePage({ params }: Props) {
           )}
         </article>
 
-        {/* Related Guides */}
-        {relatedGuides.length > 0 && (
-          <section className="mt-10 sm:mt-16 max-w-3xl">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-              {page.city ? `More Guides for ${page.city}` : "Related Guides"}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {relatedGuides.map((guide) => (
-                <Link
-                  key={guide.slug}
-                  href={`/guides/${guide.slug}`}
-                  className="block p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
-                >
-                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">{guide.title}</h3>
-                  {guide.city && (
-                    <p className="text-xs text-gray-500 mt-1">{guide.city}, {guide.state}</p>
-                  )}
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Related Resources */}
+        {/* Related Guides & Resources (single merged section) */}
         {relatedResources.length > 0 && (
           <section className="mt-10 sm:mt-16 max-w-3xl">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
               {page.city
-                ? `More Resources for ${page.city}, ${page.state}`
+                ? `More in ${page.city}, ${page.state}`
                 : "Related Resources"}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
