@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
-import { getSEOPageBySlug, getSEOPages, getCityGroups } from "@/lib/sheets";
+import { getSEOPageBySlug, getSEOPages, getCityGroups, getStateGroups } from "@/lib/sheets";
 import {
   generateBreadcrumbJsonLd,
   generateFAQJsonLd,
 } from "@/lib/seo";
+import { injectInternalLinks, getRelatedResources } from "@/lib/internal-links";
 import JsonLd from "@/components/JsonLd";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FAQ from "@/components/FAQ";
@@ -128,10 +129,11 @@ export async function generateStaticParams() {
 }
 
 export default async function GuidePage({ params }: Props) {
-  const [page, allPages, cityGroups] = await Promise.all([
+  const [page, allPages, cityGroups, stateGroups] = await Promise.all([
     getSEOPageBySlug(params.slug),
     getSEOPages(),
     getCityGroups(),
+    getStateGroups(),
   ]);
   if (!page) notFound();
 
@@ -162,10 +164,24 @@ export default async function GuidePage({ params }: Props) {
   const faqSectionIndex = page.content.search(
     /(?:## FAQ|## Frequently Asked Questions|Q:)/i
   );
-  const mainContent =
+  const rawContent =
     faqSectionIndex > 0
       ? page.content.slice(0, faqSectionIndex)
       : page.content;
+
+  // Inject internal links into article content
+  const linkCtx = {
+    cityGroups,
+    stateGroups,
+    seoPages: allPages,
+    currentSlug: page.slug,
+    currentCity: page.city,
+    currentState: page.state,
+  };
+  const mainContent = injectInternalLinks(rawContent, linkCtx);
+
+  // Get related resources for the sidebar/footer section
+  const relatedResources = getRelatedResources(linkCtx);
 
   return (
     <>
@@ -227,6 +243,33 @@ export default async function GuidePage({ params }: Props) {
                   {guide.city && (
                     <p className="text-xs text-gray-500 mt-1">{guide.city}, {guide.state}</p>
                   )}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Related Resources */}
+        {relatedResources.length > 0 && (
+          <section className="mt-10 sm:mt-16 max-w-3xl">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+              {page.city
+                ? `More Resources for ${page.city}, ${page.state}`
+                : "Related Resources"}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {relatedResources.map((r) => (
+                <Link
+                  key={r.href}
+                  href={r.href}
+                  className="block p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
+                >
+                  <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
+                    {r.type}
+                  </span>
+                  <h3 className="text-sm font-semibold text-gray-900 mt-1 line-clamp-2">
+                    {r.title}
+                  </h3>
                 </Link>
               ))}
             </div>

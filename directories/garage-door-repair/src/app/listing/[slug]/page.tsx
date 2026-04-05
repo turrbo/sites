@@ -68,9 +68,13 @@ export default async function ListingPage({ params }: Props) {
 
   const categorySlug = slugify(listing.category);
 
+  const citySlug = `/${listing.state.toLowerCase()}/${slugify(listing.city)}`;
+  const stateSlug = `/${listing.state.toLowerCase()}`;
+
   const breadcrumbItems = [
     { name: "Home", url: "/" },
-    { name: listing.category, url: `/category/${categorySlug}` },
+    { name: listing.stateFull || listing.state, url: stateSlug },
+    { name: listing.city, url: citySlug },
     { name: listing.name, url: `/listing/${listing.slug}` },
   ];
 
@@ -206,7 +210,13 @@ export default async function ListingPage({ params }: Props) {
                 <p className="text-gray-800">
                   {listing.address}
                   <br />
-                  {listing.city}, {listing.state}
+                  <Link href={citySlug} className="text-blue-600 hover:underline">
+                    {listing.city}
+                  </Link>
+                  ,{" "}
+                  <Link href={stateSlug} className="text-blue-600 hover:underline">
+                    {listing.state}
+                  </Link>
                   {listing.zip && ` ${listing.zip}`}
                 </p>
               </div>
@@ -291,7 +301,10 @@ export default async function ListingPage({ params }: Props) {
       {relatedListings.length > 0 && (
         <section className="container py-8 sm:py-12">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-            More Garage Door Services in {listing.city}, {listing.state}
+            More Garage Door Services in{" "}
+            <Link href={citySlug} className="text-blue-600 hover:underline">
+              {listing.city}, {listing.state}
+            </Link>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {relatedListings.map((rl) => (
