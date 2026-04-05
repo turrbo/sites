@@ -6,8 +6,8 @@ function getStripe() {
 }
 
 const PRICE_MAP: Record<string, { amount: number; label: string }> = {
-  basic: { amount: 9900, label: "Basic Listing - 1 Year" },
-  featured: { amount: 29900, label: "Featured Listing - 1 Year" },
+  basic: { amount: 9900, label: "Basic Listing" },
+  featured: { amount: 29900, label: "Featured Listing" },
 };
 
 export async function POST(req: NextRequest) {
@@ -25,11 +25,12 @@ export async function POST(req: NextRequest) {
       email,
       description,
       hours,
+      googleBusinessUrl,
       plan,
     } = body;
 
     // Validate required fields
-    if (!businessName || !address || !city || !state || !zip || !phone || !email || !description) {
+    if (!businessName || !address || !city || !state || !zip || !phone || !email || !description || !googleBusinessUrl) {
       return NextResponse.json(
         { error: "Please fill in all required fields." },
         { status: 400 }
@@ -45,7 +46,23 @@ export async function POST(req: NextRequest) {
 
     const priceInfo = PRICE_MAP[plan];
 
-    // Create Stripe Checkout session
+    // Business metadata (stored on subscription for webhook access)
+    const metadata = {
+      businessName,
+      address,
+      city,
+      state,
+      zip,
+      phone,
+      website: website || "",
+      email,
+      description: description.slice(0, 500),
+      hours: (hours || "").slice(0, 500),
+      googleBusinessUrl: (googleBusinessUrl || "").slice(0, 500),
+      plan,
+    };
+
+    // Create Stripe Checkout session with annual subscription
     const session = await getStripe().checkout.sessions.create({
       payment_method_types: ["card"],
       customer_email: email,
@@ -55,29 +72,23 @@ export async function POST(req: NextRequest) {
             currency: "usd",
             product_data: {
               name: priceInfo.label,
-              description: `Directory listing for ${businessName} in ${city}, ${state}`,
+              description: `Annual directory listing for ${businessName} in ${city}, ${state}`,
             },
             unit_amount: priceInfo.amount,
+            recurring: {
+              interval: "year",
+            },
           },
           quantity: 1,
         },
       ],
-      mode: "payment",
+      mode: "subscription",
+      subscription_data: {
+        metadata,
+      },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/list-your-business/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/list-your-business`,
-      metadata: {
-        businessName,
-        address,
-        city,
-        state,
-        zip,
-        phone,
-        website: website || "",
-        email,
-        description: description.slice(0, 500),
-        hours: (hours || "").slice(0, 500),
-        plan,
-      },
+      metadata,
     });
 
     return NextResponse.json({ checkoutUrl: session.url });

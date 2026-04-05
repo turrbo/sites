@@ -11,7 +11,7 @@ export const siteConfig = {
   ogImage: "/og-default.png",
 
   // Contact info for footer
-  email: "hello@example.com",
+  email: "garagedoorrepairdirectory@gmail.com",
 
   // Social links (leave empty to hide)
   social: {

@@ -15,6 +15,7 @@ interface FormData {
   email: string;
   description: string;
   hours: string;
+  googleBusinessUrl: string;
   plan: Plan;
 }
 
@@ -37,6 +38,7 @@ export default function ListingForm() {
     email: "",
     description: "",
     hours: "",
+    googleBusinessUrl: "",
     plan: "featured",
   });
   const [submitting, setSubmitting] = useState(false);
@@ -241,6 +243,25 @@ export default function ListingForm() {
           onChange={(e) => update("website", e.target.value)}
           placeholder="https://yourwebsite.com"
         />
+      </div>
+
+      {/* Google Business URL */}
+      <div>
+        <label htmlFor="googleBusinessUrl" className={labelClass}>
+          Google Business Profile URL *
+        </label>
+        <input
+          id="googleBusinessUrl"
+          type="url"
+          required
+          className={inputClass}
+          value={form.googleBusinessUrl}
+          onChange={(e) => update("googleBusinessUrl", e.target.value)}
+          placeholder="https://www.google.com/maps/place/..."
+        />
+        <p className="mt-1 text-xs text-gray-500">
+          Search your business on Google Maps, click your listing, then copy the URL from your browser.
+        </p>
       </div>
 
       {/* Description */}

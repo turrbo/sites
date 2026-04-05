@@ -268,11 +268,18 @@ export async function getListingsByCity(
   state: string
 ): Promise<Listing[]> {
   const listings = await getAllListings();
-  return listings.filter(
-    (l) =>
-      l.city.toLowerCase() === city.toLowerCase() &&
-      l.state.toLowerCase() === state.toLowerCase()
-  );
+  return listings
+    .filter(
+      (l) =>
+        l.city.toLowerCase() === city.toLowerCase() &&
+        l.state.toLowerCase() === state.toLowerCase()
+    )
+    .sort((a, b) => {
+      // Featured listings first
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+      return a.name.localeCompare(b.name);
+    });
 }
 
 export async function getListingsByState(
