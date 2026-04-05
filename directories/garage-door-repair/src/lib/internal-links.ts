@@ -116,6 +116,33 @@ function buildLinkTargets(ctx: LinkContext): LinkTarget[] {
     });
   }
 
+  // 4. Short service keyword links → same-city guide pages
+  // Maps common short phrases in article content to the correct guide slug pattern
+  if (currentCity && currentState) {
+    const citySlug = slugify(ctx.currentCity || "");
+    const stateSlug = currentState;
+    const keywordGuideMap: [string, string][] = [
+      ["spring replacement", `garage-door-spring-repair-${citySlug}-${stateSlug}`],
+      ["spring repair", `garage-door-spring-repair-${citySlug}-${stateSlug}`],
+      ["opener repair", `garage-door-opener-repair-${citySlug}-${stateSlug}`],
+      ["opener replacement", `garage-door-opener-repair-${citySlug}-${stateSlug}`],
+      ["garage door installation", `garage-door-installation-${citySlug}-${stateSlug}`],
+      ["garage door maintenance", `garage-door-maintenance-${citySlug}-${stateSlug}`],
+      ["garage door insulation", `garage-door-insulation-${citySlug}-${stateSlug}`],
+      ["emergency garage door", `emergency-garage-door-repair-${citySlug}-${stateSlug}`],
+      ["commercial garage door", `commercial-garage-door-repair-${citySlug}-${stateSlug}`],
+    ];
+
+    // Only add if the target guide page actually exists
+    const slugSet = new Set(ctx.seoPages.map((p) => p.slug));
+    for (const [text, guideSlug] of keywordGuideMap) {
+      if (guideSlug === ctx.currentSlug) continue;
+      if (slugSet.has(guideSlug)) {
+        targets.push({ text, href: `/guides/${guideSlug}`, priority: 6 });
+      }
+    }
+  }
+
   return targets;
 }
 
