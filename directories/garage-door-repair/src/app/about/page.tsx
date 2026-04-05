@@ -66,11 +66,26 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-gray-900 mt-10 mb-4">
             Cities We Serve
           </h2>
+          <p className="text-gray-600 leading-relaxed mb-4">
+            We currently feature garage door repair companies in major cities
+            across the United States. Browse our city pages to find trusted
+            local professionals near you:
+          </p>
+          <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+            <li><Link href="/ny/new-york" className="text-blue-600 hover:text-blue-700 font-medium">New York, NY</Link></li>
+            <li><Link href="/ca/los-angeles" className="text-blue-600 hover:text-blue-700 font-medium">Los Angeles, CA</Link></li>
+            <li><Link href="/il/chicago" className="text-blue-600 hover:text-blue-700 font-medium">Chicago, IL</Link></li>
+            <li><Link href="/tx/houston" className="text-blue-600 hover:text-blue-700 font-medium">Houston, TX</Link></li>
+            <li><Link href="/az/phoenix" className="text-blue-600 hover:text-blue-700 font-medium">Phoenix, AZ</Link></li>
+            <li><Link href="/pa/philadelphia" className="text-blue-600 hover:text-blue-700 font-medium">Philadelphia, PA</Link></li>
+            <li><Link href="/tx/san-antonio" className="text-blue-600 hover:text-blue-700 font-medium">San Antonio, TX</Link></li>
+            <li><Link href="/ca/san-diego" className="text-blue-600 hover:text-blue-700 font-medium">San Diego, CA</Link></li>
+            <li><Link href="/tx/dallas" className="text-blue-600 hover:text-blue-700 font-medium">Dallas, TX</Link></li>
+            <li><Link href="/tx/austin" className="text-blue-600 hover:text-blue-700 font-medium">Austin, TX</Link></li>
+          </ul>
           <p className="text-gray-600 leading-relaxed">
-            We currently feature garage door repair companies in major cities including
-            New York, Los Angeles, Chicago, Houston, Phoenix, Philadelphia, San Antonio,
-            San Diego, Dallas, and Austin. We are continuously expanding our directory
-            to include more cities and service areas across all 50 states.
+            We are continuously expanding our directory to include more cities
+            and service areas across all 50 states.
           </p>
 
           <h2 className="text-2xl font-bold text-gray-900 mt-10 mb-4">
