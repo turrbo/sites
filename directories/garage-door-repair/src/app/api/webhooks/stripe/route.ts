@@ -284,10 +284,7 @@ export async function POST(req: NextRequest) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         if (session.mode === "subscription" && session.metadata) {
-          const subscriptionId =
-            typeof session.subscription === "string"
-              ? session.subscription
-              : session.subscription?.id || "";
+          const subscriptionId = String(session.subscription || "");
           await appendToSheet(session.metadata, subscriptionId);
           console.log(
             `New listing submitted: ${session.metadata.businessName} (${session.metadata.plan}) [${subscriptionId}]`
@@ -298,7 +295,8 @@ export async function POST(req: NextRequest) {
 
       // Subscription cancelled or expired - unpublish the listing
       case "customer.subscription.deleted": {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = event.data
+          .object as Stripe.Subscription;
         await updateListingStatus(subscription.id, "FALSE", "cancelled");
         console.log(`Subscription cancelled: ${subscription.id}`);
         break;
@@ -307,10 +305,7 @@ export async function POST(req: NextRequest) {
       // Payment failed on renewal - mark as past due
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
-        const subId =
-          typeof invoice.subscription === "string"
-            ? invoice.subscription
-            : invoice.subscription?.id;
+        const subId = String(invoice.subscription || "");
         if (subId) {
           await updateListingStatus(subId, "FALSE", "past_due");
           console.log(`Payment failed for subscription: ${subId}`);
@@ -323,10 +318,7 @@ export async function POST(req: NextRequest) {
         const invoice = event.data.object as Stripe.Invoice;
         // Only handle renewal invoices (not the first one)
         if (invoice.billing_reason === "subscription_cycle") {
-          const subId =
-            typeof invoice.subscription === "string"
-              ? invoice.subscription
-              : invoice.subscription?.id;
+          const subId = String(invoice.subscription || "");
           if (subId) {
             await updateListingStatus(subId, "TRUE", "active");
             console.log(`Subscription renewed: ${subId}`);
