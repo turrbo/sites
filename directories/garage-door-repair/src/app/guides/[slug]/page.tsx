@@ -123,10 +123,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export async function generateStaticParams() {
-  const pages = await getSEOPagesMeta();
-  return pages.map((p) => ({ slug: p.slug }));
-}
+// Skip generateStaticParams — 550+ guides with full HTML content exceed
+// Vercel's 2MB data cache limit when pre-rendered at build time.
+// Pages are generated on-demand with ISR (revalidate = 3600) instead.
 
 export default async function GuidePage({ params }: Props) {
   const [page, allPages, cityGroups, stateGroups] = await Promise.all([
