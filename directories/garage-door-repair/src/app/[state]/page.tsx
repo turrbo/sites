@@ -58,15 +58,15 @@ export default async function StatePage({ params }: Props) {
   // Guides for cities in this state
   const stateGuides = seoPages.filter(
     (p) => p.state?.toLowerCase() === params.state.toLowerCase()
-  ).slice(0, 10);
+  );
 
   // Other state pages for cross-linking
   const otherStates = stateGroups
-    .filter((s) => s.state.toLowerCase() !== params.state.toLowerCase())
-    .slice(0, 10);
+    .filter((s) => s.state.toLowerCase() !== params.state.toLowerCase());
 
   const breadcrumbItems = [
     { name: "Home", url: "/" },
+    { name: "Browse", url: "/browse" },
     { name: stateGroup.stateFull, url: `/${params.state}` },
   ];
 

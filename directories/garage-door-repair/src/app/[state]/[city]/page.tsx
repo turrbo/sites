@@ -84,6 +84,7 @@ export default async function CityPage({ params }: Props) {
 
   const breadcrumbItems = [
     { name: "Home", url: "/" },
+    { name: "Browse", url: "/browse" },
     { name: stateFull, url: `/${params.state}` },
     { name: cityGroup.city, url: `/${params.state}/${params.city}` },
   ];
