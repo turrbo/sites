@@ -32,6 +32,9 @@ export const siteConfig = {
   // Footer links
   footerLinks: [
     { label: "About", href: "/about" },
+    { label: "Coverage", href: "/coverage" },
+    { label: "Cost Calculator", href: "/cost-calculator" },
+    { label: "Research", href: "/research" },
     { label: "Contact", href: "/contact" },
     { label: "Privacy", href: "/privacy" },
   ],
