@@ -118,29 +118,29 @@ export default async function BadgePage({ params }: Props) {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
               Badge Preview
             </h2>
-            <div className="flex flex-col sm:flex-row gap-6 items-start">
+            <div className="flex flex-col gap-6 items-start">
               <div>
                 <p className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-medium">
-                  Standard (280 x 100)
+                  Standard (440 x 130)
                 </p>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={badgeUrl}
                   alt={`${tier.name} badge for ${listing.name}`}
-                  width={280}
-                  height={100}
+                  width={440}
+                  height={130}
                 />
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-medium">
-                  Compact (200 x 56)
+                  Compact (240 x 60)
                 </p>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={`${badgeUrl}?size=compact`}
                   alt={`${tier.name} badge for ${listing.name} (compact)`}
-                  width={200}
-                  height={56}
+                  width={240}
+                  height={60}
                 />
               </div>
             </div>

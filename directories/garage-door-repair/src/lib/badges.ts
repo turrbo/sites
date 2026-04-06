@@ -107,19 +107,30 @@ function truncateName(name: string, maxLen: number): string {
   return name.slice(0, maxLen - 1) + "\u2026";
 }
 
-// Shield icon paths for each tier
+// Circle icon for each tier (100x100 viewBox, used inside a <g> with scaling)
 function getIconSvg(tier: BadgeTier): string {
   if (tier.level === 4) {
-    // Crown
-    return `<path d="M6 18L3 9l5 3 4-6 4 6 5-3-3 9H6z" fill="${tier.accentColor}" stroke="${tier.color}" stroke-width="1.5"/>`;
+    // Navy circle with gold crown
+    return `<circle cx="50" cy="50" r="46" fill="${tier.color}"/>
+      <path d="M26 62L22 36l12 8 16-18 16 18 12-8-4 26H26z" fill="${tier.accentColor}" stroke="${tier.accentColor}" stroke-width="1.5" stroke-linejoin="round"/>
+      <rect x="24" y="60" width="52" height="6" rx="2" fill="${tier.accentColor}"/>`;
   }
   if (tier.level === 3) {
-    // Star
-    return `<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="${tier.accentColor}" stroke="${tier.color}" stroke-width="1"/>`;
+    // Gold circle with star
+    return `<circle cx="50" cy="50" r="46" fill="${tier.accentColor}"/>
+      <path d="M50 18l7.9 16 17.6 2.6-12.7 12.4 3 17.5L50 58.2l-15.8 8.3 3-17.5L24.5 36.6l17.6-2.6L50 18z" fill="white" stroke="white" stroke-width="1"/>`;
   }
-  // Shield with checkmark (tiers 1 & 2)
-  return `<path d="M12 2L4 6v5c0 5.25 3.4 10.2 8 12 4.6-1.8 8-6.75 8-12V6l-8-4z" fill="${tier.color}" opacity="0.15" stroke="${tier.color}" stroke-width="1.5"/><path d="M9 12l2 2 4-4" fill="none" stroke="${tier.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  if (tier.level === 2) {
+    // Blue circle with shield + checkmark
+    return `<circle cx="50" cy="50" r="46" fill="${tier.color}"/>
+      <path d="M50 18L30 28v14c0 14.4 8.5 27.8 20 32 11.5-4.2 20-17.6 20-32V28L50 18z" fill="white" opacity="0.25"/>
+      <path d="M50 22L33 30.5v12c0 12.5 7.3 24 17 27.5 9.7-3.5 17-15 17-27.5v-12L50 22z" fill="none" stroke="white" stroke-width="2.5"/>
+      <path d="M39 50l7 7 15-16" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
   }
+  // Tier 1: Gray circle with checkmark
+  return `<circle cx="50" cy="50" r="46" fill="${tier.color}"/>
+    <path d="M25 50l15 15 28-30" fill="none" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
 
 export function generateBadgeSVG(
   listing: Listing,
@@ -127,37 +138,29 @@ export function generateBadgeSVG(
   size: "default" | "compact" = "default"
 ): string {
   const year = new Date().getFullYear();
-  const name = escapeXml(truncateName(listing.name, size === "compact" ? 20 : 32));
+  const name = escapeXml(truncateName(listing.name, size === "compact" ? 24 : 36));
   const tierLabel = escapeXml(
     tier.level === 3 || tier.level === 4
       ? `${tier.name} ${year}`
       : tier.name
   );
+  const font = `system-ui,-apple-system,'Segoe UI',Roboto,sans-serif`;
 
   if (size === "compact") {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="56" viewBox="0 0 200 56">
-  <rect width="200" height="56" rx="6" fill="white" stroke="${tier.color}" stroke-width="1.5"/>
-  <g transform="translate(8, 8) scale(0.7)">${getIconSvg(tier)}</g>
-  <text x="32" y="22" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="${tier.color}">${tierLabel}</text>
-  <text x="32" y="36" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#6B7280">${name}</text>
-  <text x="32" y="48" font-family="system-ui,-apple-system,sans-serif" font-size="7" fill="#9CA3AF">GarageDoorRepair.Directory</text>
+    // Compact: 240x60, transparent, icon left + text right
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="60" viewBox="0 0 240 60">
+  <g transform="translate(4, 6) scale(0.48)">${getIconSvg(tier)}</g>
+  <text x="36" y="20" font-family="${font}" font-size="9" fill="#9CA3AF" font-weight="400">GarageDoorRepair.Directory</text>
+  <text x="36" y="36" font-family="${font}" font-size="16" fill="${tier.color}" font-weight="800">${tierLabel.toUpperCase()}</text>
+  <text x="36" y="52" font-family="${font}" font-size="11" fill="#6B7280" font-weight="500">${name}</text>
 </svg>`;
   }
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="280" height="100" viewBox="0 0 280 100">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:white"/>
-      <stop offset="100%" style="stop-color:${tier.bgColor}"/>
-    </linearGradient>
-  </defs>
-  <rect width="280" height="100" rx="8" fill="url(#bg)" stroke="${tier.color}" stroke-width="2"/>
-  <rect x="0" y="0" width="6" height="100" rx="8" fill="${tier.color}"/>
-  <g transform="translate(18, 16) scale(1.1)">${getIconSvg(tier)}</g>
-  <text x="52" y="34" font-family="system-ui,-apple-system,sans-serif" font-size="15" font-weight="700" fill="${tier.color}">${tierLabel}</text>
-  <text x="52" y="54" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="500" fill="#374151">${name}</text>
-  <line x1="52" y1="64" x2="260" y2="64" stroke="${tier.color}" stroke-width="0.5" opacity="0.3"/>
-  <text x="52" y="80" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#9CA3AF">GarageDoorRepair.Directory</text>
-  ${tier.level >= 3 ? `<text x="52" y="92" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#9CA3AF">${listing.rating ? listing.rating.toFixed(1) + " ★" : ""} ${listing.reviewCount ? "· " + listing.reviewCount + " reviews" : ""}</text>` : ""}
+  // Default: 440x130, transparent background, large circle icon + text
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="440" height="130" viewBox="0 0 440 130">
+  <g transform="translate(10, 14)">${getIconSvg(tier)}</g>
+  <text x="125" y="40" font-family="${font}" font-size="15" fill="#9CA3AF" font-weight="400" letter-spacing="0.5">GarageDoorRepair.Directory</text>
+  <text x="125" y="76" font-family="${font}" font-size="30" fill="${tier.color}" font-weight="800" letter-spacing="-0.5">${tierLabel.toUpperCase()}</text>
+  <text x="125" y="102" font-family="${font}" font-size="16" fill="#6B7280" font-weight="500">${name}</text>
 </svg>`;
 }

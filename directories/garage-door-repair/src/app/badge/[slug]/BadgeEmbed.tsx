@@ -19,8 +19,8 @@ export default function BadgeEmbed({
   const [copied, setCopied] = useState(false);
 
   const imgUrl = size === "compact" ? `${badgeUrl}?size=compact` : badgeUrl;
-  const width = size === "compact" ? 200 : 280;
-  const height = size === "compact" ? 56 : 100;
+  const width = size === "compact" ? 240 : 440;
+  const height = size === "compact" ? 60 : 130;
 
   const embedCode = `<a href="${listingUrl}" target="_blank" rel="noopener">\n  <img src="${imgUrl}" alt="${tierName} on GarageDoorRepair.Directory" width="${width}" height="${height}" />\n</a>`;
 
