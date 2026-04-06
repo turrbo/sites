@@ -280,6 +280,17 @@ function parseNumber(val: string): number | undefined {
   return isNaN(n) ? undefined : n;
 }
 
+/** Only return URL if it looks like a valid social media link */
+function parseSocialUrl(val: string, ...domains: string[]): string | undefined {
+  const url = (val || "").trim();
+  if (!url || !url.startsWith("http")) return undefined;
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    if (domains.some((d) => hostname.includes(d))) return url;
+  } catch {}
+  return undefined;
+}
+
 function parseList(val: string): string[] | undefined {
   if (!val.trim()) return undefined;
   return val.split(",").map((s) => s.trim()).filter(Boolean);
@@ -316,12 +327,12 @@ function mapListing(row: SheetRow): Listing {
     published: row["Published"] ? parseBoolean(row["Published"]) : true,
     tags: parseList(row["Tags"]),
     services: parseList(row["Services"]),
-    facebook: row["Facebook"] || undefined,
-    instagram: row["Instagram"] || undefined,
-    yelp: row["Yelp"] || undefined,
-    twitter: row["Twitter"] || undefined,
-    youtube: row["YouTube"] || undefined,
-    nextdoor: row["Nextdoor"] || undefined,
+    facebook: parseSocialUrl(row["Facebook"], "facebook.com"),
+    instagram: parseSocialUrl(row["Instagram"], "instagram.com"),
+    yelp: parseSocialUrl(row["Yelp"], "yelp.com"),
+    twitter: parseSocialUrl(row["Twitter"], "twitter.com", "x.com"),
+    youtube: parseSocialUrl(row["YouTube"], "youtube.com"),
+    nextdoor: parseSocialUrl(row["Nextdoor"], "nextdoor.com"),
     yearEstablished: parseNumber(row["Year Established"]),
     galleryUrls: parseList(row["Gallery"]),
   };
