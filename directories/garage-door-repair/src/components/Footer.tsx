@@ -12,14 +12,6 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-bold text-lg mb-2">{siteConfig.name}</h3>
             <p className="text-sm text-gray-400">{siteConfig.tagline}</p>
-            {siteConfig.email && (
-              <a
-                href={`mailto:${siteConfig.email}`}
-                className="inline-block mt-3 text-sm text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                {siteConfig.email}
-              </a>
-            )}
           </div>
 
           {/* Footer Links */}
