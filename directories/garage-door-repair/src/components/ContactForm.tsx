@@ -29,12 +29,30 @@ export default function ContactForm() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    // TODO: Replace with your actual form submission logic
-    console.log('Form submitted:', form);
-    await new Promise((res) => setTimeout(res, 500)); // simulate async
-    setLoading(false);
-    setSubmitted(true);
-    setForm(initialState);
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          access_key: 'fe2494ee-23df-4661-81ff-9de4c137c4cf',
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          message: form.message,
+          subject: `[Contact Form] Message from ${form.name}`,
+          from_name: 'Garage Door Repair Directory',
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSubmitted(true);
+        setForm(initialState);
+      }
+    } catch {
+      // Silently handle errors
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (submitted) {
