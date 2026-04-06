@@ -94,6 +94,71 @@ export default function ListYourBusinessPage() {
         </div>
       </div>
 
+      {/* Trust Badge Section */}
+      <div className="max-w-4xl mx-auto mb-12 sm:mb-16">
+        <div className="bg-gradient-to-br from-gray-50 to-blue-50 border border-gray-200 rounded-xl p-6 sm:p-8">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Get Your Trust Badge
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Every listed business gets an embeddable trust badge to display on
+              their website. Badges build credibility with homeowners and link
+              back to your listing in our directory.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 mb-2">
+                <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+              </div>
+              <h3 className="font-semibold text-gray-700 text-sm">Listed</h3>
+              <p className="text-xs text-gray-500 mt-1">All businesses</p>
+            </div>
+            <div className="bg-white rounded-lg border border-blue-200 p-4 text-center">
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 mb-2">
+                <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+              </div>
+              <h3 className="font-semibold text-blue-700 text-sm">Verified</h3>
+              <p className="text-xs text-gray-500 mt-1">3.5+ rating, website, reviews</p>
+            </div>
+            <div className="bg-white rounded-lg border border-amber-200 p-4 text-center">
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 mb-2">
+                <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+              </div>
+              <h3 className="font-semibold text-amber-700 text-sm">Top Rated</h3>
+              <p className="text-xs text-gray-500 mt-1">4.3+ rating, 25+ reviews</p>
+            </div>
+            <div className="bg-white rounded-lg border border-indigo-200 p-4 text-center">
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 mb-2">
+                <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+              </div>
+              <h3 className="font-semibold text-indigo-700 text-sm">Featured</h3>
+              <p className="text-xs text-gray-500 mt-1">Top Rated + Featured plan</p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <h3 className="font-semibold text-gray-900 text-sm mb-2">How It Works</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600">
+              <div>
+                <span className="font-medium text-gray-900">1. Get listed</span>
+                <p className="mt-0.5">Submit your business and your badge is generated automatically based on your Google ratings and reviews.</p>
+              </div>
+              <div>
+                <span className="font-medium text-gray-900">2. Copy the embed code</span>
+                <p className="mt-0.5">Visit your badge page and copy a simple HTML snippet to paste on your website footer or sidebar.</p>
+              </div>
+              <div>
+                <span className="font-medium text-gray-900">3. Build trust</span>
+                <p className="mt-0.5">The badge shows homeowners you are recognized by an independent directory, and links back to your listing for SEO value.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Submission Form */}
       <div className="max-w-2xl mx-auto">
         <div className="bg-white border border-gray-200 rounded-xl p-6 sm:p-8">
