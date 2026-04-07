@@ -59,6 +59,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.className}>
+      <Script
+        src="https://analytics.ahrefs.com/analytics.js"
+        data-key="xvYUwFvfB9q6wKEJYtvquA"
+        strategy="afterInteractive"
+      />
       {GA_ID && (
         <>
           <Script
