@@ -189,8 +189,8 @@ export default async function GuidePage({ params }: Props) {
         <article className="mt-4 sm:mt-6 max-w-3xl">
           <header className="mb-6 sm:mb-8">
             <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs sm:text-sm font-medium rounded-full capitalize">
-                {page.type}
+              <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs sm:text-sm font-medium rounded-full">
+                Guide
               </span>
               {page.category && (
                 <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs sm:text-sm rounded-full">
