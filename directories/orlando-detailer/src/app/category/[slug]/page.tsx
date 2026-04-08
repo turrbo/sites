@@ -6,6 +6,7 @@ import {
   getAllCategories,
 } from "@/lib/sheets";
 import { generateBreadcrumbJsonLd, generateItemListJsonLd } from "@/lib/seo";
+import { resolveIcon } from "@/lib/icons";
 import JsonLd from "@/components/JsonLd";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ListingGrid from "@/components/ListingGrid";
@@ -72,7 +73,7 @@ export default async function CategoryPage({ params }: Props) {
 
         <div className="mt-6">
           {category.icon && (
-            <span className="text-4xl mb-3 block">{category.icon}</span>
+            <span className="text-4xl mb-3 block">{resolveIcon(category.icon)}</span>
           )}
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {category.name}

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Category } from '@/lib/types';
+import { resolveIcon } from '@/lib/icons';
 
 interface Props {
   category: Category;
@@ -15,7 +16,7 @@ export default function CategoryCard({ category, count }: Props) {
       {/* Icon */}
       <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center transition-colors text-2xl">
         {category.icon ? (
-          <span aria-hidden="true">{category.icon}</span>
+          <span aria-hidden="true">{resolveIcon(category.icon)}</span>
         ) : (
           <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />

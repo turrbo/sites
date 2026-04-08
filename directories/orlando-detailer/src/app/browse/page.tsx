@@ -3,6 +3,7 @@ import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { getCityGroups, getAllCategories, slugify } from "@/lib/sheets";
 import { generateBreadcrumbJsonLd } from "@/lib/seo";
+import { resolveIcon } from "@/lib/icons";
 import JsonLd from "@/components/JsonLd";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
@@ -62,7 +63,7 @@ export default async function BrowsePage() {
                     href={`/category/${cat.slug}`}
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-50 text-amber-800 font-medium text-sm rounded-lg border border-amber-200 hover:bg-amber-100 hover:border-amber-300 transition-all"
                   >
-                    {cat.icon && <span>{cat.icon}</span>}
+                    {cat.icon && <span>{resolveIcon(cat.icon)}</span>}
                     {cat.name}
                   </Link>
                 ))}
