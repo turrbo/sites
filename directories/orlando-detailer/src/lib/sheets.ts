@@ -47,10 +47,9 @@ async function getSeedListings(): Promise<Listing[]> {
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!;
-const GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || "").replace(
-  /\\n/g,
-  "\n"
-);
+const GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || "")
+  .replace(/\\\\n/g, "\n")  // double-escaped \\n from Coolify env vars
+  .replace(/\\n/g, "\n");   // single-escaped \n from .env.local
 
 const LISTINGS_SHEET = process.env.SHEETS_LISTINGS_TAB || "Listings";
 const CATEGORIES_SHEET = process.env.SHEETS_CATEGORIES_TAB || "Categories";
