@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { getGuides } from "@/lib/sheets";
 import { siteConfig } from "@/config/site";
@@ -44,19 +45,30 @@ export default async function GuidesPage() {
                   <Link
                     key={guide.slug}
                     href={`/guides/${guide.slug}`}
-                    className="card p-5 hover:border-amber-200"
+                    className="card overflow-hidden hover:border-amber-200"
                   >
-                    <h3 className="text-base font-semibold text-gray-900 mb-1 line-clamp-2">
-                      {guide.title}
-                    </h3>
-                    {guide.publishedAt && (
-                      <p className="text-xs text-gray-400">
-                        {new Date(guide.publishedAt).toLocaleDateString(
-                          "en-US",
-                          { month: "short", day: "numeric", year: "numeric" }
-                        )}
-                      </p>
-                    )}
+                    <div className="relative h-40 bg-gray-100">
+                      <Image
+                        src={`/images/guides/${guide.slug}.png`}
+                        alt={guide.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </div>
+                    <div className="p-5">
+                      <h3 className="text-base font-semibold text-gray-900 mb-1 line-clamp-2">
+                        {guide.title}
+                      </h3>
+                      {guide.publishedAt && (
+                        <p className="text-xs text-gray-400">
+                          {new Date(guide.publishedAt).toLocaleDateString(
+                            "en-US",
+                            { month: "short", day: "numeric", year: "numeric" }
+                          )}
+                        </p>
+                      )}
+                    </div>
                   </Link>
                 ))}
               </div>

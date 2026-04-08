@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { getReviews } from "@/lib/sheets";
 import { siteConfig } from "@/config/site";
@@ -22,7 +23,7 @@ export default async function ReviewsPage({
   const filtered = categoryFilter
     ? reviews.filter(
         (r) =>
-          r.category.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "") ===
+          r.category.toLowerCase().replace(/&/g, "").replace(/\s+/g, "-").replace(/-+/g, "-") ===
           categoryFilter
       )
     : reviews;
@@ -71,26 +72,37 @@ export default async function ReviewsPage({
             <Link
               key={review.slug}
               href={`/reviews/${review.slug}`}
-              className="card p-6 hover:border-amber-200"
+              className="card overflow-hidden hover:border-amber-200"
             >
-              <span className="inline-block px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded mb-3">
-                {review.category}
-              </span>
-              <h2 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                {review.title}
-              </h2>
-              <p className="text-sm text-gray-500">
-                {review.products.length} products compared
-              </p>
-              {review.publishedAt && (
-                <p className="text-xs text-gray-400 mt-2">
-                  {new Date(review.publishedAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+              <div className="relative h-48 bg-gray-100">
+                <Image
+                  src={`/images/reviews/${review.slug}.png`}
+                  alt={review.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
+              <div className="p-6">
+                <span className="inline-block px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded mb-3">
+                  {review.category}
+                </span>
+                <h2 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                  {review.title}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {review.products.length} products compared
                 </p>
-              )}
+                {review.publishedAt && (
+                  <p className="text-xs text-gray-400 mt-2">
+                    {new Date(review.publishedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </p>
+                )}
+              </div>
             </Link>
           ))}
         </div>

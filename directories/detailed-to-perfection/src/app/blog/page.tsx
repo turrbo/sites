@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { getBlogPosts } from "@/lib/sheets";
 
@@ -27,15 +28,15 @@ export default async function BlogPage() {
               href={`/blog/${post.slug}`}
               className="card overflow-hidden hover:border-amber-200"
             >
-              {post.imageUrl && (
-                <div className="aspect-video bg-gray-100 overflow-hidden">
-                  <img
-                    src={post.imageUrl}
-                    alt={post.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+              <div className="relative h-48 bg-gray-100">
+                <Image
+                  src={post.imageUrl || `/images/blog/${post.slug}.png`}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
               <div className="p-5">
                 {post.category && (
                   <span className="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded mb-2">
