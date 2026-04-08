@@ -70,6 +70,16 @@ export default function Footer() {
               <li><Link href="/guides" className="text-sm text-gray-400 hover:text-white transition-colors">Auto Care Guides</Link></li>
               <li><Link href="/get-quotes" className="text-sm text-amber-400 hover:text-amber-300 transition-colors font-medium">Get Free Quotes</Link></li>
               <li><Link href="/blog" className="text-sm text-gray-400 hover:text-white transition-colors">Blog</Link></li>
+              <li>
+                <a
+                  href="https://detailedtoperfection.com"
+                  className="text-sm text-gray-400 hover:text-white transition-colors"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  Product Reviews &rarr;
+                </a>
+              </li>
             </ul>
           </div>
         </div>

@@ -11,7 +11,8 @@ import {
   getStateGroups,
 } from "@/lib/sheets";
 import { generateBreadcrumbJsonLd } from "@/lib/seo";
-import { injectInternalLinks, getRelatedResources } from "@/lib/internal-links";
+import { injectInternalLinks, getRelatedResources, getDTPCallout } from "@/lib/internal-links";
+import DTPCalloutBox from "@/components/DTPCallout";
 import JsonLd from "@/components/JsonLd";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
@@ -71,6 +72,7 @@ export default async function BlogPostPage({ params }: Props) {
     currentState: post.state,
   };
   const linkedContent = injectInternalLinks(post.content, linkCtx);
+  const dtpCallout = getDTPCallout(post.content);
   const relatedResources = getRelatedResources(linkCtx);
 
   // Related blog posts: same category or same city
@@ -170,6 +172,8 @@ export default async function BlogPostPage({ params }: Props) {
             className="prose prose-gray max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-a:text-blue-600 prose-strong:text-gray-900"
             dangerouslySetInnerHTML={{ __html: linkedContent }}
           />
+
+          {dtpCallout && <DTPCalloutBox callout={dtpCallout} />}
         </article>
 
         {/* Related Blog Posts */}

@@ -7,7 +7,8 @@ import {
   generateBreadcrumbJsonLd,
   generateFAQJsonLd,
 } from "@/lib/seo";
-import { injectInternalLinks, getRelatedResources } from "@/lib/internal-links";
+import { injectInternalLinks, getRelatedResources, getDTPCallout } from "@/lib/internal-links";
+import DTPCalloutBox from "@/components/DTPCallout";
 import JsonLd from "@/components/JsonLd";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FAQ from "@/components/FAQ";
@@ -172,6 +173,7 @@ export default async function GuidePage({ params }: Props) {
     currentState: page.state,
   };
   const mainContent = injectInternalLinks(rawContent, linkCtx);
+  const dtpCallout = getDTPCallout(rawContent);
 
   // Get related resources for the sidebar/footer section
   const relatedResources = getRelatedResources(linkCtx);
@@ -208,6 +210,8 @@ export default async function GuidePage({ params }: Props) {
             className="prose prose-gray max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-a:text-blue-600 prose-strong:text-gray-900"
             dangerouslySetInnerHTML={{ __html: mainContent }}
           />
+
+          {dtpCallout && <DTPCalloutBox callout={dtpCallout} />}
 
           {faqs.length > 0 && (
             <div className="mt-10">

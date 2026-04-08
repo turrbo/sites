@@ -223,6 +223,126 @@ function linkFirstOccurrence(
 }
 
 /**
+ * DTP cross-site callout: keyword in page content -> relevant DTP review/guide URL.
+ * Returns the first matching callout for the given content, or null.
+ */
+export interface DTPCallout {
+  label: string;
+  url: string;
+  description: string;
+}
+
+const DTP_BASE = "https://detailedtoperfection.com";
+
+const DTP_CALLOUTS: { keywords: RegExp; callout: DTPCallout }[] = [
+  {
+    keywords: /ceramic\s+coat/i,
+    callout: {
+      label: "Best Ceramic Coating Sprays 2026",
+      url: `${DTP_BASE}/reviews/best-ceramic-coating-sprays-2026`,
+      description: "See our hands-on reviews of the top ceramic coating sprays.",
+    },
+  },
+  {
+    keywords: /paint\s+correct|polish|compound/i,
+    callout: {
+      label: "Best Polishing Compounds Reviewed",
+      url: `${DTP_BASE}/reviews/best-polishing-compounds-for-paint-correction`,
+      description: "Compare polishing compounds rated by cut, finish, and ease of use.",
+    },
+  },
+  {
+    keywords: /foam\s+cannon|foam\s+gun|pre.?wash/i,
+    callout: {
+      label: "Best Foam Cannons 2026",
+      url: `${DTP_BASE}/reviews/best-foam-cannons-for-car-washing`,
+      description: "Find the right foam cannon for your wash setup.",
+    },
+  },
+  {
+    keywords: /pressure\s+wash|power\s+wash/i,
+    callout: {
+      label: "Best Pressure Washers for Detailing",
+      url: `${DTP_BASE}/reviews/best-pressure-washers-for-auto-detailing`,
+      description: "Pressure washers reviewed specifically for auto detailing use.",
+    },
+  },
+  {
+    keywords: /interior\s+detail|leather\s+clean|upholster/i,
+    callout: {
+      label: "Best Interior Detailing Kits",
+      url: `${DTP_BASE}/reviews/best-interior-detailing-kits`,
+      description: "Complete interior kits reviewed for leather, fabric, and plastics.",
+    },
+  },
+  {
+    keywords: /clay\s+bar|decontam/i,
+    callout: {
+      label: "How to Clay Bar Your Car",
+      url: `${DTP_BASE}/guides/how-to-clay-bar-your-car-complete-guide`,
+      description: "Step-by-step clay bar guide from our detailing experts.",
+    },
+  },
+  {
+    keywords: /wax|sealant|paint\s+protect/i,
+    callout: {
+      label: "Best Car Waxes and Sealants",
+      url: `${DTP_BASE}/reviews/best-car-waxes-and-sealants-2026`,
+      description: "Waxes and sealants compared for durability and gloss.",
+    },
+  },
+  {
+    keywords: /microfiber|towel|dry/i,
+    callout: {
+      label: "Best Microfiber Towels Reviewed",
+      url: `${DTP_BASE}/reviews/best-microfiber-towels-for-detailing`,
+      description: "We tested dozens of microfiber towels for wash, buff, and detail.",
+    },
+  },
+  {
+    keywords: /wheel\s+clean|rim|brake\s+dust/i,
+    callout: {
+      label: "Best Wheel Cleaners 2026",
+      url: `${DTP_BASE}/reviews/best-wheel-cleaners-2026`,
+      description: "Acid-free and heavy-duty wheel cleaners put to the test.",
+    },
+  },
+  {
+    keywords: /window\s+tint|tint\s+film/i,
+    callout: {
+      label: "Window Tint Maintenance Guide",
+      url: `${DTP_BASE}/guides/window-tint-care-and-maintenance`,
+      description: "How to care for window tint so it lasts.",
+    },
+  },
+  {
+    keywords: /PPF|paint\s+protection\s+film|clear\s+bra/i,
+    callout: {
+      label: "PPF vs Ceramic Coating vs Vinyl Wrap",
+      url: `${DTP_BASE}/blog/ppf-vs-ceramic-coating-vs-vinyl-wrap-complete-comparison`,
+      description: "In-depth comparison to help you choose the right protection.",
+    },
+  },
+  {
+    keywords: /detail|wash|car\s+care/i,
+    callout: {
+      label: "Detailed to Perfection",
+      url: DTP_BASE,
+      description: "Product reviews and how-to guides for auto detailing enthusiasts.",
+    },
+  },
+];
+
+export function getDTPCallout(content: string): DTPCallout | null {
+  for (const entry of DTP_CALLOUTS) {
+    if (entry.keywords.test(content)) {
+      return entry.callout;
+    }
+  }
+  return null;
+}
+
+/**
  * Generate a contextual "Related Resources" section for any page.
  * Returns an array of { title, href, type } objects.
  */
