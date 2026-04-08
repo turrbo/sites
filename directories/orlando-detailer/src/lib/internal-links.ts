@@ -55,54 +55,32 @@ export function injectInternalLinks(
 function buildLinkTargets(ctx: LinkContext): LinkTarget[] {
   const targets: LinkTarget[] = [];
   const currentCity = ctx.currentCity?.toLowerCase();
-  const currentState = ctx.currentState?.toLowerCase();
 
-  // 1. City page links (high priority for cities in same state)
+  // 1. City page links (high priority for nearby cities)
   for (const cg of ctx.cityGroups) {
-    // Skip current city
-    if (
-      cg.city.toLowerCase() === currentCity &&
-      cg.state.toLowerCase() === currentState
-    ) {
-      continue;
-    }
+    if (cg.city.toLowerCase() === currentCity) continue;
 
-    const href = `/${cg.state.toLowerCase()}/${slugify(cg.city)}`;
-    const sameState = cg.state.toLowerCase() === currentState;
+    const href = `/${cg.slug || slugify(cg.city)}`;
 
-    // Link "City, ST" format
+    // Link "City" name
     targets.push({
-      text: `${cg.city}, ${cg.state}`,
+      text: cg.city,
       href,
-      priority: sameState ? 8 : 3,
+      priority: 6,
     });
 
-    // Also link just the city name if it's distinctive enough (>5 chars)
-    if (cg.city.length > 5 && sameState) {
-      targets.push({
-        text: cg.city,
-        href,
-        priority: 5,
-      });
-    }
-  }
-
-  // 2. State page links
-  for (const sg of ctx.stateGroups) {
-    if (sg.state.toLowerCase() === currentState) continue;
-
+    // Link "City, FL" format
     targets.push({
-      text: sg.stateFull,
-      href: `/${sg.state.toLowerCase()}`,
-      priority: 2,
+      text: `${cg.city}, FL`,
+      href,
+      priority: 7,
     });
   }
 
-  // 3. Guide page links (high priority for same-city guides)
+  // 2. Guide page links (high priority for same-city guides)
   for (const page of ctx.seoPages) {
     if (page.slug === ctx.currentSlug) continue;
 
-    // Extract a linkable phrase from the title
     const phrase = extractLinkPhrase(page.title);
     if (!phrase || phrase.length < 8) continue;
 
@@ -112,25 +90,30 @@ function buildLinkTargets(ctx: LinkContext): LinkTarget[] {
     targets.push({
       text: phrase,
       href: `/guides/${page.slug}`,
-      priority: sameCity ? 7 : 4,
+      priority: sameCity ? 8 : 4,
     });
   }
 
-  // 4. Short service keyword links → same-city guide pages
-  // Maps common short phrases in article content to the correct guide slug pattern
-  if (currentCity && currentState) {
+  // 3. Service keyword links -> same-city guide pages
+  if (currentCity) {
     const citySlug = slugify(ctx.currentCity || "");
-    const stateSlug = currentState;
     const keywordGuideMap: [string, string][] = [
-      ["spring replacement", `garage-door-spring-repair-${citySlug}-${stateSlug}`],
-      ["spring repair", `garage-door-spring-repair-${citySlug}-${stateSlug}`],
-      ["opener repair", `garage-door-opener-repair-${citySlug}-${stateSlug}`],
-      ["opener replacement", `garage-door-opener-repair-${citySlug}-${stateSlug}`],
-      ["garage door installation", `garage-door-installation-${citySlug}-${stateSlug}`],
-      ["garage door maintenance", `garage-door-maintenance-${citySlug}-${stateSlug}`],
-      ["garage door insulation", `garage-door-insulation-${citySlug}-${stateSlug}`],
-      ["emergency garage door", `emergency-garage-door-repair-${citySlug}-${stateSlug}`],
-      ["commercial garage door", `commercial-garage-door-repair-${citySlug}-${stateSlug}`],
+      ["auto detailing", `best-auto-detailing-${citySlug}-fl`],
+      ["car detailing", `best-auto-detailing-${citySlug}-fl`],
+      ["ceramic coating", `ceramic-coating-cost-${citySlug}-fl`],
+      ["ceramic coat", `ceramic-coating-cost-${citySlug}-fl`],
+      ["window tinting", `window-tinting-laws-${citySlug}-fl`],
+      ["window tint", `best-window-tint-shops-${citySlug}-fl`],
+      ["tint shops", `best-window-tint-shops-${citySlug}-fl`],
+      ["vehicle wrap", `vehicle-wrap-cost-${citySlug}-fl`],
+      ["car wrap", `vehicle-wrap-cost-${citySlug}-fl`],
+      ["paint protection film", `ppf-vs-ceramic-coating-${citySlug}-fl`],
+      ["PPF", `ppf-vs-ceramic-coating-${citySlug}-fl`],
+      ["mobile detailing", `mobile-detailing-services-${citySlug}-fl`],
+      ["fleet wraps", `commercial-fleet-wraps-${citySlug}-fl`],
+      ["commercial wraps", `commercial-fleet-wraps-${citySlug}-fl`],
+      ["paint correction", `best-auto-detailing-${citySlug}-fl`],
+      ["interior detailing", `best-auto-detailing-${citySlug}-fl`],
     ];
 
     // Only add if the target guide page actually exists
@@ -143,6 +126,11 @@ function buildLinkTargets(ctx: LinkContext): LinkTarget[] {
     }
   }
 
+  // 4. Cross-page links: cost calculator, browse, blog
+  targets.push({ text: "cost calculator", href: "/cost-calculator", priority: 5 });
+  targets.push({ text: "browse shops", href: "/browse", priority: 3 });
+  targets.push({ text: "get quotes", href: "/get-quotes", priority: 3 });
+
   return targets;
 }
 
@@ -154,13 +142,14 @@ function extractLinkPhrase(title: string): string | null {
   let phrase = title
     // Remove "Best ... in City, ST" pattern
     .replace(/\s+in\s+[A-Z][a-zA-Z\s]+,?\s*[A-Z]{0,2}\s*$/i, "")
+    // Remove trailing " - City, FL" or " City FL"
+    .replace(/\s*[-–]\s*[A-Z][a-zA-Z\s]+,?\s*FL\s*$/i, "")
     // Remove leading "Best" / "Top" / "Guide to"
     .replace(/^(?:Best|Top|Guide to|How to Choose|Finding)\s+/i, "")
     // Remove trailing "Guide" / "Services"
-    .replace(/\s+(?:Guide|Services|Companies|Providers|Experts)$/i, "")
+    .replace(/\s+(?:Guide|Services|Companies|Providers|Experts|Shops)$/i, "")
     .trim();
 
-  // If the phrase is just the original title minus a city, use it
   if (phrase.length >= 8 && phrase.length <= 60) {
     return phrase;
   }
@@ -235,7 +224,7 @@ function linkFirstOccurrence(
 
 /**
  * Generate a contextual "Related Resources" section for any page.
- * Returns an array of { title, href, description } objects.
+ * Returns an array of { title, href, type } objects.
  */
 export function getRelatedResources(
   ctx: LinkContext,
@@ -258,39 +247,25 @@ export function getRelatedResources(
     }
   }
 
-  // Same-state cities
-  if (ctx.currentState) {
-    for (const cg of ctx.cityGroups) {
-      if (
-        cg.city.toLowerCase() === ctx.currentCity?.toLowerCase() &&
-        cg.state.toLowerCase() === ctx.currentState?.toLowerCase()
-      ) {
-        continue;
-      }
-      if (cg.state.toLowerCase() === ctx.currentState?.toLowerCase()) {
-        resources.push({
-          title: `Garage Door Repair in ${cg.city}, ${cg.state}`,
-          href: `/${cg.state.toLowerCase()}/${slugify(cg.city)}`,
-          type: "city",
-          priority: 6,
-        });
-      }
-    }
+  // Other cities
+  for (const cg of ctx.cityGroups) {
+    if (cg.city.toLowerCase() === ctx.currentCity?.toLowerCase()) continue;
+
+    resources.push({
+      title: `Auto Detailing in ${cg.city}, FL`,
+      href: `/${cg.slug || slugify(cg.city)}`,
+      type: "city",
+      priority: 6,
+    });
   }
 
-  // State page
-  if (ctx.currentState) {
-    for (const sg of ctx.stateGroups) {
-      if (sg.state.toLowerCase() === ctx.currentState?.toLowerCase()) {
-        resources.push({
-          title: `All Cities in ${sg.stateFull}`,
-          href: `/${sg.state.toLowerCase()}`,
-          type: "state",
-          priority: 5,
-        });
-      }
-    }
-  }
+  // Cost calculator
+  resources.push({
+    title: "Auto Care Cost Calculator",
+    href: "/cost-calculator",
+    type: "tool",
+    priority: 7,
+  });
 
   return resources
     .sort((a, b) => b.priority - a.priority)
