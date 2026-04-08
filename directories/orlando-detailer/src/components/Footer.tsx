@@ -66,6 +66,7 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-3 text-sm uppercase tracking-wider">Explore</h4>
             <ul className="space-y-2">
               <li><Link href="/browse" className="text-sm text-gray-400 hover:text-white transition-colors">Browse Shops</Link></li>
+              <li><Link href="/cost-calculator" className="text-sm text-gray-400 hover:text-white transition-colors">Cost Calculator</Link></li>
               <li><Link href="/guides" className="text-sm text-gray-400 hover:text-white transition-colors">Auto Care Guides</Link></li>
               <li><Link href="/get-quotes" className="text-sm text-amber-400 hover:text-amber-300 transition-colors font-medium">Get Free Quotes</Link></li>
               <li><Link href="/blog" className="text-sm text-gray-400 hover:text-white transition-colors">Blog</Link></li>
