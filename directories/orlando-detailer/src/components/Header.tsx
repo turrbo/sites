@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { siteConfig } from '@/config/site';
 
 export default function Header() {
@@ -14,14 +13,10 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center hover:opacity-90 transition-opacity">
-            <Image
-              src="/logo.png"
-              alt={siteConfig.name}
-              width={280}
-              height={48}
-              className="h-9 sm:h-10 w-auto"
-              priority
-            />
+            <span className="text-xl sm:text-2xl tracking-tight">
+              <span className="font-light text-slate-900">Orlando</span>
+              <span className="font-bold text-slate-900">Detailer</span>
+            </span>
           </Link>
 
           {/* Desktop Nav */}

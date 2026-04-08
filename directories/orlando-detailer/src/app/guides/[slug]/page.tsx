@@ -249,16 +249,16 @@ export default async function GuidePage({ params }: Props) {
         {/* Browse by City */}
         <section className="mt-10 sm:mt-16 max-w-3xl">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-            Browse Garage Door Repair by City
+            Browse Auto Care Shops by City
           </h2>
           <div className="flex flex-wrap gap-2">
             {cityGroups.map((cg) => (
               <Link
                 key={`${cg.city}-${cg.state}`}
-                href={`/${cg.state.toLowerCase()}/${cg.city.toLowerCase().replace(/\s+/g, "-")}`}
+                href={`/${cg.slug}`}
                 className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors"
               >
-                {cg.city}, {cg.state} ({cg.count})
+                {cg.city} ({cg.count})
               </Link>
             ))}
           </div>

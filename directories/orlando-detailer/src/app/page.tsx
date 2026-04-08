@@ -10,7 +10,7 @@ import {
 import { generateItemListJsonLd } from "@/lib/seo";
 import Hero from "@/components/Hero";
 import NearbyListings from "@/components/NearbyListings";
-import CityCard from "@/components/CityCard";
+import CityDropdown from "@/components/CityDropdown";
 import JsonLd from "@/components/JsonLd";
 
 export const revalidate = 3600;
@@ -88,11 +88,7 @@ export default async function HomePage() {
             <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
               Explore listings in your area
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-              {cityGroups.map((city) => (
-                <CityCard key={`${city.city}-${city.state}`} cityGroup={city} />
-              ))}
-            </div>
+            <CityDropdown cities={cityGroups} />
           </div>
         </section>
       )}
@@ -101,10 +97,10 @@ export default async function HomePage() {
         <section className="py-10 sm:py-16 bg-gray-50" id="guides">
           <div className="container">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
-              Garage Door Repair Guides
+              Auto Care Guides
             </h2>
             <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
-              Expert guides and cost information for your city
+              Expert detailing, tinting, and wrap guides for your city
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {homepageGuides.map((guide) => guide && (
