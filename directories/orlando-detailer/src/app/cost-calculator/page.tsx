@@ -4,11 +4,11 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import JsonLd from '@/components/JsonLd';
 
 export const metadata: Metadata = {
-  title: 'Auto Detailing Cost Calculator | Orlando Detailer',
+  title: 'Auto Detailing Cost Calculator',
   description:
     'Estimate the cost of auto detailing, ceramic coating, window tinting, PPF, vehicle wraps, and more in the Orlando area. Get instant price ranges by vehicle size and service type.',
   openGraph: {
-    title: 'Auto Detailing Cost Calculator | Orlando Detailer',
+    title: 'Auto Detailing Cost Calculator',
     description:
       'Estimate the cost of auto detailing, ceramic coating, window tinting, PPF, vehicle wraps, and more in the Orlando area.',
     url: 'https://orlandodetailer.com/cost-calculator',
