@@ -104,7 +104,7 @@ export default function ListingCard({ listing }: Props) {
           <Link
             href={`/get-quotes?service=${encodeURIComponent(listing.category)}&source=listing-card`}
             className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-md transition-colors"
-            onClick={(e) => e.stopPropagation()}
+
           >
             Request Quote
           </Link>
