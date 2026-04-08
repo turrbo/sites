@@ -6,9 +6,11 @@ const USE_SEED_DATA = !process.env.GOOGLE_SHEET_ID;
 // --- Google Sheets Configuration ---
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!;
-const GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || "")
-  .replace(/\\\\n/g, "\n")
-  .replace(/\\n/g, "\n");
+const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY_BASE64
+  ? Buffer.from(process.env.GOOGLE_PRIVATE_KEY_BASE64, "base64").toString("utf8")
+  : (process.env.GOOGLE_PRIVATE_KEY || "")
+      .replace(/\\\\n/g, "\n")
+      .replace(/\\n/g, "\n");
 
 const REVIEWS_SHEET = process.env.SHEETS_REVIEWS_TAB || "Reviews";
 const GUIDES_SHEET = process.env.SHEETS_GUIDES_TAB || "Guides";

@@ -19,9 +19,11 @@ for (const line of envFile.split("\n")) {
 
 const SPREADSHEET_ID = env.GOOGLE_SHEET_ID;
 const SERVICE_ACCOUNT_EMAIL = env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-const PRIVATE_KEY = (env.GOOGLE_PRIVATE_KEY || "")
-  .replace(/\\\\n/g, "\n")
-  .replace(/\\n/g, "\n");
+const PRIVATE_KEY = env.GOOGLE_PRIVATE_KEY_BASE64
+  ? Buffer.from(env.GOOGLE_PRIVATE_KEY_BASE64, "base64").toString("utf8")
+  : (env.GOOGLE_PRIVATE_KEY || "")
+      .replace(/\\\\n/g, "\n")
+      .replace(/\\n/g, "\n");
 
 function base64url(input) {
   return Buffer.from(input)
