@@ -2,12 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
-import { getSEOPageBySlug, getSEOPagesMeta, getCityGroups, getStateGroups } from "@/lib/sheets";
+import { getSEOPageBySlug, getSEOPages, getCityGroups } from "@/lib/sheets";
 import {
   generateBreadcrumbJsonLd,
   generateFAQJsonLd,
 } from "@/lib/seo";
-import { injectInternalLinks, getRelatedResources } from "@/lib/internal-links";
 import JsonLd from "@/components/JsonLd";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FAQ from "@/components/FAQ";
@@ -123,18 +122,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// Skip generateStaticParams — 550+ guides with full HTML content exceed
-// Vercel's 2MB data cache limit when pre-rendered at build time.
-// Pages are generated on-demand with ISR (revalidate = 3600) instead.
+// generateStaticParams removed: 4,300+ guide pages would cause build-time failures
+// (each page fetches the full sheet). Pages render on-demand with ISR (revalidate=3600).
 
 export default async function GuidePage({ params }: Props) {
-  const [page, allPages, cityGroups, stateGroups] = await Promise.all([
+  const [page, allPages, cityGroups] = await Promise.all([
     getSEOPageBySlug(params.slug),
-    getSEOPagesMeta(),
+    getSEOPages(),
     getCityGroups(),
-    getStateGroups(),
   ]);
   if (!page) notFound();
+
+  // Related guides: same city or same topic type
+  const relatedGuides = allPages
+    .filter((p) => p.slug !== page.slug)
+    .filter((p) => (page.city && p.city === page.city) || (!page.city && p.type === page.type))
+    .slice(0, 6);
 
   const breadcrumbItems = [
     { name: "Home", url: "/" },
@@ -157,24 +160,10 @@ export default async function GuidePage({ params }: Props) {
   const faqSectionIndex = page.content.search(
     /(?:## FAQ|## Frequently Asked Questions|Q:)/i
   );
-  const rawContent =
+  const mainContent =
     faqSectionIndex > 0
       ? page.content.slice(0, faqSectionIndex)
       : page.content;
-
-  // Inject internal links into article content
-  const linkCtx = {
-    cityGroups,
-    stateGroups,
-    seoPages: allPages,
-    currentSlug: page.slug,
-    currentCity: page.city,
-    currentState: page.state,
-  };
-  const mainContent = injectInternalLinks(rawContent, linkCtx);
-
-  // Get related resources for the sidebar/footer section
-  const relatedResources = getRelatedResources(linkCtx);
 
   return (
     <>
@@ -219,27 +208,23 @@ export default async function GuidePage({ params }: Props) {
           )}
         </article>
 
-        {/* Related Guides & Resources (single merged section) */}
-        {relatedResources.length > 0 && (
+        {/* Related Guides */}
+        {relatedGuides.length > 0 && (
           <section className="mt-10 sm:mt-16 max-w-3xl">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-              {page.city
-                ? `More in ${page.city}, ${page.state}`
-                : "Related Resources"}
+              {page.city ? `More Guides for ${page.city}` : "Related Guides"}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {relatedResources.map((r) => (
+              {relatedGuides.map((guide) => (
                 <Link
-                  key={r.href}
-                  href={r.href}
+                  key={guide.slug}
+                  href={`/guides/${guide.slug}`}
                   className="block p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
                 >
-                  <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
-                    {r.type}
-                  </span>
-                  <h3 className="text-sm font-semibold text-gray-900 mt-1 line-clamp-2">
-                    {r.title}
-                  </h3>
+                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">{guide.title}</h3>
+                  {guide.city && (
+                    <p className="text-xs text-gray-500 mt-1">{guide.city}, {guide.state}</p>
+                  )}
                 </Link>
               ))}
             </div>

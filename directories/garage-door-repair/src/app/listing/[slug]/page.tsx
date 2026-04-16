@@ -7,7 +7,7 @@ import {
   getListingBySlug,
   getAllListings,
   getListingsByCity,
-  getSEOPagesMeta,
+  getSEOPages,
   slugify,
 } from "@/lib/sheets";
 import {
@@ -45,9 +45,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// Skip generateStaticParams — 1600+ listings exceed Google Sheets API
-// rate limits at build time (429 quota errors). Pages render on-demand
-// with ISR (revalidate = 3600) instead.
+// generateStaticParams removed: 3,565 listing pages would cause build-time failures.
+// Pages render on-demand with ISR (revalidate=3600).
 
 function stripHtml(text: string): string {
   return text.replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'");
@@ -59,7 +58,7 @@ export default async function ListingPage({ params }: Props) {
 
   const [cityListings, seoPages] = await Promise.all([
     getListingsByCity(listing.city, listing.state),
-    getSEOPagesMeta(),
+    getSEOPages(),
   ]);
 
   const relatedListings = cityListings.filter((l) => l.slug !== listing.slug).slice(0, 4);
@@ -67,13 +66,9 @@ export default async function ListingPage({ params }: Props) {
 
   const categorySlug = slugify(listing.category);
 
-  const citySlug = `/${listing.state.toLowerCase()}/${slugify(listing.city)}`;
-  const stateSlug = `/${listing.state.toLowerCase()}`;
-
   const breadcrumbItems = [
     { name: "Home", url: "/" },
-    { name: listing.stateFull || listing.state, url: stateSlug },
-    { name: listing.city, url: citySlug },
+    { name: listing.category, url: `/category/${categorySlug}` },
     { name: listing.name, url: `/listing/${listing.slug}` },
   ];
 
@@ -111,27 +106,18 @@ export default async function ListingPage({ params }: Props) {
               </span>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{listing.name}</h1>
 
-              {(listing.rating !== undefined || listing.yearEstablished) && (
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
-                  {listing.rating !== undefined && (
-                    <>
-                      <span className="text-yellow-400 text-lg">★</span>
-                      <span className="font-semibold">{listing.rating.toFixed(1)}</span>
-                      {listing.reviewCount && (
-                        <span className="text-gray-500 text-sm">
-                          ({listing.reviewCount} reviews)
-                        </span>
-                      )}
-                    </>
-                  )}
-                  {listing.priceRange && (
+              {listing.rating !== undefined && (
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-yellow-400 text-lg">★</span>
+                  <span className="font-semibold">{listing.rating.toFixed(1)}</span>
+                  {listing.reviewCount && (
                     <span className="text-gray-500 text-sm">
-                      · {listing.priceRange}
+                      ({listing.reviewCount} reviews)
                     </span>
                   )}
-                  {listing.yearEstablished && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-sm font-medium rounded-full">
-                      Est. {listing.yearEstablished} · {new Date().getFullYear() - listing.yearEstablished}+ years
+                  {listing.priceRange && (
+                    <span className="text-gray-500 text-sm ml-2">
+                      · {listing.priceRange}
                     </span>
                   )}
                 </div>
@@ -143,24 +129,6 @@ export default async function ListingPage({ params }: Props) {
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">About</h2>
                 <p className="text-gray-700 leading-relaxed">{stripHtml(listing.description)}</p>
-              </div>
-            )}
-
-            {/* Services */}
-            {listing.services && listing.services.length > 0 && (
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">Services Offered</h2>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {listing.services.map((service) => (
-                    <li
-                      key={service}
-                      className="flex items-center gap-2 text-gray-700"
-                    >
-                      <span className="text-blue-500 text-sm">&#9679;</span>
-                      {service}
-                    </li>
-                  ))}
-                </ul>
               </div>
             )}
 
@@ -185,18 +153,18 @@ export default async function ListingPage({ params }: Props) {
             )}
 
             {/* Gallery */}
-            {listing.galleryUrls && listing.galleryUrls.length > 0 && (
+            {listing.gallery && listing.gallery.length > 0 && (
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">Photos</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">Gallery</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {listing.galleryUrls.map((url, idx) => (
+                  {listing.gallery.map((img) => (
                     <div
-                      key={url}
+                      key={img.url}
                       className="relative h-40 rounded-lg overflow-hidden"
                     >
                       <Image
-                        src={url}
-                        alt={`${listing.name} photo ${idx + 1}`}
+                        src={img.url}
+                        alt={img.filename}
                         fill
                         className="object-cover"
                       />
@@ -218,13 +186,7 @@ export default async function ListingPage({ params }: Props) {
                 <p className="text-gray-800">
                   {listing.address}
                   <br />
-                  <Link href={citySlug} className="text-blue-600 hover:underline">
-                    {listing.city}
-                  </Link>
-                  ,{" "}
-                  <Link href={stateSlug} className="text-blue-600 hover:underline">
-                    {listing.state}
-                  </Link>
+                  {listing.city}, {listing.state}
                   {listing.zip && ` ${listing.zip}`}
                 </p>
               </div>
@@ -271,47 +233,6 @@ export default async function ListingPage({ params }: Props) {
                 </div>
               )}
 
-              {/* Social Media */}
-              {(listing.facebook || listing.instagram || listing.yelp || listing.twitter || listing.youtube) && (
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                    Follow
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {listing.facebook && (
-                      <a href={listing.facebook} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-sm rounded-lg hover:bg-blue-100 transition-colors" title="Facebook">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                        Facebook
-                      </a>
-                    )}
-                    {listing.instagram && (
-                      <a href={listing.instagram} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-pink-50 text-pink-700 text-sm rounded-lg hover:bg-pink-100 transition-colors" title="Instagram">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-                        Instagram
-                      </a>
-                    )}
-                    {listing.yelp && (
-                      <a href={listing.yelp} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 text-sm rounded-lg hover:bg-red-100 transition-colors" title="Yelp">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.986-4.375c.546-.8 1.77-.386 1.77.6v3.372c0 .26-.198.508-.585.6zm-8.93 5.236l-.263-5.222c-.05-.98 1.13-1.503 1.782-.79l3.46 3.78c.63.687.037 1.803-.86 1.614l-3.534-.742c-.32-.067-.56-.32-.586-.64zM6.655 9.87l4.86 1.862c.93.355.93 1.687 0 2.042L6.655 15.63c-.866.332-1.71-.52-1.226-1.236l2.06-3.045c.115-.17.115-.394 0-.563L5.43 7.74c-.484-.717.36-1.568 1.226-1.236v3.365zM11.33 2.6l.29 5.223c.054.98-1.127 1.503-1.78.79L6.38 4.833c-.63-.687-.038-1.803.86-1.614l3.505.742c.32.067.56.32.586.64z"/></svg>
-                        Yelp
-                      </a>
-                    )}
-                    {listing.twitter && (
-                      <a href={listing.twitter} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors" title="X / Twitter">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                        X
-                      </a>
-                    )}
-                    {listing.youtube && (
-                      <a href={listing.youtube} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 text-sm rounded-lg hover:bg-red-100 transition-colors" title="YouTube">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                        YouTube
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
-
               {/* CTA */}
               {listing.website && (
                 <a
@@ -350,10 +271,7 @@ export default async function ListingPage({ params }: Props) {
       {relatedListings.length > 0 && (
         <section className="container py-8 sm:py-12">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-            More Garage Door Services in{" "}
-            <Link href={citySlug} className="text-blue-600 hover:underline">
-              {listing.city}, {listing.state}
-            </Link>
+            More Garage Door Services in {listing.city}, {listing.state}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {relatedListings.map((rl) => (
