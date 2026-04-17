@@ -1,4 +1,7 @@
 import { Review, Guide, BlogPost, Product } from "./types";
+import reviewsJson from "../data/reviews.json";
+import guidesJson from "../data/guides.json";
+import blogJson from "../data/blog.json";
 
 // --- Local seed data fallback ---
 const USE_SEED_DATA = !process.env.GOOGLE_SHEET_ID;
@@ -234,19 +237,24 @@ function mapBlogPost(row: SheetRow): BlogPost {
 
 // --- Public API ---
 
+const staticReviews = reviewsJson as Review[];
+const staticGuides = guidesJson as Guide[];
+const staticBlog = blogJson as BlogPost[];
+
 export async function getReviews(): Promise<Review[]> {
-  if (USE_SEED_DATA) return [];
+  if (USE_SEED_DATA) return staticReviews;
   try {
     const rows = await fetchSheetUncached(REVIEWS_SHEET);
-    return rows
+    const sheetReviews = rows
       .map(mapReview)
       .filter((r) => r.published)
       .sort((a, b) => {
         if (a.publishedAt && b.publishedAt) return b.publishedAt.localeCompare(a.publishedAt);
         return a.title.localeCompare(b.title);
       });
+    return sheetReviews.length > 0 ? sheetReviews : staticReviews;
   } catch {
-    return [];
+    return staticReviews;
   }
 }
 
@@ -263,18 +271,19 @@ export async function getReviewsByCategory(category: string): Promise<Review[]> 
 }
 
 export async function getGuides(): Promise<Guide[]> {
-  if (USE_SEED_DATA) return [];
+  if (USE_SEED_DATA) return staticGuides;
   try {
     const rows = await fetchSheetUncached(GUIDES_SHEET);
-    return rows
+    const sheetGuides = rows
       .map(mapGuide)
       .filter((g) => g.published)
       .sort((a, b) => {
         if (a.publishedAt && b.publishedAt) return b.publishedAt.localeCompare(a.publishedAt);
         return a.title.localeCompare(b.title);
       });
+    return sheetGuides.length > 0 ? sheetGuides : staticGuides;
   } catch {
-    return [];
+    return staticGuides;
   }
 }
 
@@ -291,18 +300,19 @@ export async function getGuidesByCategory(category: string): Promise<Guide[]> {
 }
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
-  if (USE_SEED_DATA) return [];
+  if (USE_SEED_DATA) return staticBlog;
   try {
     const rows = await fetchSheet(BLOG_SHEET);
-    return rows
+    const sheetPosts = rows
       .map(mapBlogPost)
       .filter((p) => p.published)
       .sort((a, b) => {
         if (a.publishedAt && b.publishedAt) return b.publishedAt.localeCompare(a.publishedAt);
         return a.title.localeCompare(b.title);
       });
+    return sheetPosts.length > 0 ? sheetPosts : staticBlog;
   } catch {
-    return [];
+    return staticBlog;
   }
 }
 
