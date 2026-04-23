@@ -1,14 +1,20 @@
 # Sites
 
-Directory sites monorepo.
+Directory sites monorepo
 
-## Structure
+## Directories
 
-```
-directories/
-  garage-door-repair/   - garagedoorrepair.directory
-```
+- `detailed-to-perfection`
+- `garage-door-repair`
+- `orlando-detailer`
 
 ## Deployment
+Each directory site is intended to deploy independently, with the Vercel project root set to the specific site folder under `directories/`.
 
-Each directory site deploys to Vercel independently. Set the root directory in Vercel project settings to the specific site folder (e.g., `directories/garage-door-repair`).
+## Repository layout
+```text
+directories/
+  detailed-to-perfection/
+  garage-door-repair/
+  orlando-detailer/
+```
